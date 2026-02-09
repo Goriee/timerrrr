@@ -29,6 +29,7 @@ export async function handleKillCommand(message: Message, args: string[]) {
     // Calculate next spawn
     // boss.respawn_hours is likely a number in DB, but TS might see it as any. 
     const nextSpawn = new Date(now.getTime() + (boss.respawn_hours as number) * 60 * 60 * 1000);
+    const unixTime = Math.floor(nextSpawn.getTime() / 1000);
 
     // Update boss in DB
     await pool.query(
@@ -36,7 +37,7 @@ export async function handleKillCommand(message: Message, args: string[]) {
       [now, nextSpawn, boss.id]
     );
 
-    message.reply(`✅ **${boss.name}** killed! Next spawn in ${boss.respawn_hours}h at **${nextSpawn.toLocaleString('en-US', { timeZone: 'UTC' })} UTC**.`);
+    message.reply(`✅ **${boss.name}** killed! Next spawn in ${boss.respawn_hours}h at <t:${unixTime}:f> (<t:${unixTime}:R>).`);
   } catch (error) {
     console.error(error);
     message.reply('An error occurred while updating the boss timer.');
@@ -57,7 +58,7 @@ export async function handleAllBossesCommand(message: Message) {
     }
 
     // Header for the table
-    const header = `   BOSS NAME    | LVL | INTERVAL | NEXT SPAWN`;
+    const header = `   BOSS NAME    | LVL | INT.     | EST. IN`;
     const separator = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
     
     // Formatting helper
@@ -66,7 +67,7 @@ export async function handleAllBossesCommand(message: Message) {
       const level = String(b.level || "??").padStart(3, ' ');
       const respawn = (b.respawn_hours + "h").padEnd(8, ' ');
       
-      let nextSpawn = "Not Scheduled";
+      let nextSpawn = "--";
       let icon = "⚪"; // Default grey for no schedule
 
       if (b.next_spawn_at) {
@@ -82,16 +83,20 @@ export async function handleAllBossesCommand(message: Message) {
             icon = "🔴"; // Spawning later
         }
 
-        // Format: Feb 10, 2026, 2:23 AM
-        nextSpawn = time.toLocaleString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric', 
-            hour: 'numeric', 
-            minute: 'numeric', 
-            hour12: true,
-            timeZone: 'UTC'
-        });
+        const absMs = Math.abs(diffMs);
+        const d = Math.floor(absMs / 86400000);
+        const h = Math.floor((absMs % 86400000) / 3600000);
+        const m = Math.floor((absMs % 3600000) / 60000);
+        
+        const sign = diffMs < 0 ? "-" : "";
+        if (d > 0) nextSpawn = `${sign}${d}d ${h}h`;
+        else if (h > 0) nextSpawn = `${sign}${h}h ${m}m`;
+        else nextSpawn = `${sign}${m}m`;
+        
+        // Pad for alignment, approximate length 8-10 chars
+        // But since it's the last column, strict padding isn't as critical, 
+        // essentially aligning the start is enough. 
+        // We can just return it as is.
       }
 
       return `${icon} ${name} | ${level} | ${respawn} | ${nextSpawn}`;
