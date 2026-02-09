@@ -66,8 +66,18 @@ export default function EditBossModal({
   const handleAutoCalculate = () => {
     if (lastKillAt) {
       const kill = new Date(lastKillAt);
-      const spawn = new Date(kill.getTime() + respawnHours * 60 * 60 * 1000);
-      setNextSpawnAt(spawn.toISOString().slice(0, 16));
+      // Create a new date object to avoid mutating the original
+      const spawn = new Date(kill.getTime());
+      
+      // Add respawn hours
+      spawn.setTime(spawn.getTime() + (respawnHours * 60 * 60 * 1000));
+      
+      // Adjust timezone offset to ensure ISO string works correctly in local time
+      // This creates a date string that represents "Local Time" but in ISO format for the input
+      const offset = spawn.getTimezoneOffset() * 60000;
+      const localISOTime = new Date(spawn.getTime() - offset).toISOString().slice(0, 16);
+      
+      setNextSpawnAt(localISOTime);
     }
   };
 
