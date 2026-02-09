@@ -4,21 +4,6 @@ import { useState, useEffect } from 'react';
 import { Boss, UpdateBossInput } from '@/types';
 import { formatDateTime } from '@/lib/utils';
 
-// Helper to convert a Date object or string to a local datetime-local input string (YYYY-MM-DDThh:mm)
-function toLocalInputString(dateInput: string | Date | null | undefined): string {
-  if (!dateInput) return '';
-  const date = new Date(dateInput);
-  
-  // Manual formatting to strictly preserve Local Time components
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
 interface EditBossModalProps {
   boss: Boss;
   isOpen: boolean;
@@ -40,11 +25,30 @@ export default function EditBossModal({
 
   useEffect(() => {
     if (boss.lastKillAt) {
-      setLastKillAt(toLocalInputString(boss.lastKillAt));
+      const date = new Date(boss.lastKillAt);
+      // Get local time components and format for datetime-local input
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      setLastKillAt(`${year}-${month}-${day}T${hours}:${minutes}`);
+    } else {
+      setLastKillAt('');
     }
+    
     if (boss.nextSpawnAt) {
-      setNextSpawnAt(toLocalInputString(boss.nextSpawnAt));
+      const date = new Date(boss.nextSpawnAt);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      setNextSpawnAt(`${year}-${month}-${day}T${hours}:${minutes}`);
+    } else {
+      setNextSpawnAt('');
     }
+    
     setRespawnHours(boss.respawnHours);
   }, [boss]);
 
@@ -78,18 +82,20 @@ export default function EditBossModal({
 
   const handleAutoCalculate = () => {
     if (lastKillAt && respawnHours) {
-      // lastKillAt is "YYYY-MM-DDTHH:mm" (Local String from Input)
-      // new Date(lastKillAt) parses this as Local Time
+      // Parse the local datetime input as a Date object
       const killDate = new Date(lastKillAt);
       
-      // Calculate spawn timestamp (Local Time + Hours)
-      const spawnTimestamp = killDate.getTime() + (respawnHours * 60 * 60 * 1000);
+      // Add respawn hours to get spawn time
+      const spawnDate = new Date(killDate.getTime() + (respawnHours * 60 * 60 * 1000));
       
-      // Create new Date object for the calculated time
-      const spawnDate = new Date(spawnTimestamp);
+      // Format to datetime-local input format
+      const year = spawnDate.getFullYear();
+      const month = String(spawnDate.getMonth() + 1).padStart(2, '0');
+      const day = String(spawnDate.getDate()).padStart(2, '0');
+      const hours = String(spawnDate.getHours()).padStart(2, '0');
+      const minutes = String(spawnDate.getMinutes()).padStart(2, '0');
       
-      // Format back to Local Input String
-      setNextSpawnAt(toLocalInputString(spawnDate));
+      setNextSpawnAt(`${year}-${month}-${day}T${hours}:${minutes}`);
     }
   };
 
