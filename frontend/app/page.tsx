@@ -24,7 +24,15 @@ export default function BossListClient() {
   const [filterType, setFilterType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Removed auto-login check to require login on every visit
+  // Check for existing auth on mount
+  useEffect(() => {
+    const authStatus = localStorage.getItem('guild_boss_auth');
+    const savedPassword = localStorage.getItem('guild_boss_password');
+    if (authStatus === 'true' && savedPassword) {
+      setIsAuthenticated(true);
+      setLoginPassword(savedPassword);
+    }
+  }, []);
 
   const fetchBosses = useCallback(async () => {
     try {
