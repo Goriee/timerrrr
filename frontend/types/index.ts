@@ -1,0 +1,17 @@
+export interface Boss {
+  id: number;
+  name: string;
+  attackType: 'melee' | 'magic';
+  level: number;
+  respawnHours: number;
+  location: string;
+  lastKillAt: string | null;
+  nextSpawnAt: string | null;
+  isScheduled: boolean;
+}
+
+export interface UpdateBossInput {
+  lastKillAt?: string;
+  nextSpawnAt?: string;
+  respawnHours?: number;
+}

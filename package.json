@@ -1,0 +1,47 @@
+{
+  "name": "guild-boss-timer",
+  "version": "1.0.0",
+  "description": "Full-stack application for tracking guild boss respawn timers",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "migrate": "cd backend && npm run build && npm run migrate",
+    "setup": "npm run install:all && npm run migrate",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start"
+  },
+  "keywords": [
+    "guild",
+    "boss",
+    "timer",
+    "respawn",
+    "tracker",
+    "gaming",
+    "mmo",
+    "next.js",
+    "express",
+    "postgresql"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/guild-boss-timer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/guild-boss-timer/issues"
+  },
+  "homepage": "https://github.com/yourusername/guild-boss-timer#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
