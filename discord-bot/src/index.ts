@@ -1,8 +1,25 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
+import express from 'express'; // Import express
 import { handleKillCommand, handleAllBossesCommand } from './commands';
 
 dotenv.config();
+
+// Create a simple web server to keep render happy
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.send('Discord Bot is running!');
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+app.listen(PORT, () => {
+  console.log(`Web server listening on port ${PORT}`);
+});
 
 const client = new Client({
   intents: [
