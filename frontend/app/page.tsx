@@ -283,6 +283,18 @@ export default function BossListClient() {
                   <div className="text-5xl font-mono font-bold relative z-10 tracking-wider">
                     <LiveTimer boss={nearestBoss} />
                   </div>
+                  <div className="mt-4 pt-4 border-t border-white/10 relative z-10">
+                    <div className="text-purple-300/60 text-xs uppercase tracking-widest font-semibold mb-1">Estimated Arrival</div>
+                    <div className="text-purple-100 font-mono text-lg">
+                      {new Date(nearestBoss.nextSpawnAt!).toLocaleString([], { 
+                        weekday: 'short', 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
