@@ -49,11 +49,27 @@ async function updateBosses() {
     ];
 
     for (const boss of bosses) {
-      await connection.query(
-        `INSERT INTO bosses (name, attack_type, level, respawn_hours, location) 
-         VALUES (?, ?, ?, ?, ?)`,
-        [boss.name, boss.attackType, boss.level, boss.respawnHours, boss.location]
+      // Check if boss exists
+      const [rows] = await connection.query<any[]>(
+        'SELECT id FROM bosses WHERE name = ?', 
+        [boss.name]
       );
+      
+      if (rows.length === 0) {
+        await connection.query(
+          `INSERT INTO bosses (name, attack_type, level, respawn_hours, location, created_at) 
+           VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          [boss.name, boss.attackType, boss.level, boss.respawnHours, boss.location]
+        );
+        console.log(`+ Added ${boss.name}`);
+      } else {
+        // Optional: Update static data if needed, but preserve kill times
+        await connection.query(
+          `UPDATE bosses SET attack_type=?, level=?, respawn_hours=?, location=? WHERE name=?`,
+          [boss.attackType, boss.level, boss.respawnHours, boss.location, boss.name]
+        );
+        console.log(`~ Updated ${boss.name}`);
+      }
     }
     console.log(`✓ Inserted ${bosses.length} bosses`);
 
