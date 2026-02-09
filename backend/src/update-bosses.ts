@@ -83,6 +83,19 @@ async function updateBosses() {
     }
     console.log(`✓ Inserted ${bosses.length} bosses`);
 
+    // Remove any bosses from DB that are not in our list
+    const bossNames = bosses.map(b => b.name);
+    if (bossNames.length > 0) {
+      const placeholders = bossNames.map(() => '?').join(',');
+      const [result] = await connection.query<any>(
+        `DELETE FROM bosses WHERE name NOT IN (${placeholders})`,
+        bossNames
+      );
+      if (result.affectedRows > 0) {
+        console.log(`- Removed ${result.affectedRows} obsolete bosses`);
+      }
+    }
+
     console.log('Boss update completed successfully!');
   } catch (error) {
     console.error('Boss update failed:', error);
