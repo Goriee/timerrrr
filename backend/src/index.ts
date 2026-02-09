@@ -37,11 +37,11 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+app.use(express.json()); // Ensure body parsing is enabled
 
-// Health check
-app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// Health check endpoint for UptimeRobot
+app.get('/health', (req, res) => {
+  res.status(200).send('Backend is awake!');
 });
 
 // Get all bosses
