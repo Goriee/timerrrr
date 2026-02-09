@@ -4,6 +4,15 @@ import { useState, useEffect } from 'react';
 import { Boss, UpdateBossInput } from '@/types';
 import { formatDateTime } from '@/lib/utils';
 
+// Helper to convert a UTC date string to a local datetime-local input string (YYYY-MM-DDThh:mm)
+function toLocalInputString(dateStr: string | Date | null | undefined): string {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const offset = date.getTimezoneOffset() * 60000;
+  const localDate = new Date(date.getTime() - offset);
+  return localDate.toISOString().slice(0, 16);
+}
+
 interface EditBossModalProps {
   boss: Boss;
   isOpen: boolean;
@@ -25,12 +34,10 @@ export default function EditBossModal({
 
   useEffect(() => {
     if (boss.lastKillAt) {
-      const date = new Date(boss.lastKillAt);
-      setLastKillAt(date.toISOString().slice(0, 16));
+      setLastKillAt(toLocalInputString(boss.lastKillAt));
     }
     if (boss.nextSpawnAt) {
-      const date = new Date(boss.nextSpawnAt);
-      setNextSpawnAt(date.toISOString().slice(0, 16));
+      setNextSpawnAt(toLocalInputString(boss.nextSpawnAt));
     }
     setRespawnHours(boss.respawnHours);
   }, [boss]);
@@ -72,12 +79,8 @@ export default function EditBossModal({
       // Add respawn hours
       spawn.setTime(spawn.getTime() + (respawnHours * 60 * 60 * 1000));
       
-      // Adjust timezone offset to ensure ISO string works correctly in local time
-      // This creates a date string that represents "Local Time" but in ISO format for the input
-      const offset = spawn.getTimezoneOffset() * 60000;
-      const localISOTime = new Date(spawn.getTime() - offset).toISOString().slice(0, 16);
-      
-      setNextSpawnAt(localISOTime);
+      // Use helper to format correctly for local input
+      setNextSpawnAt(toLocalInputString(spawn));
     }
   };
 
