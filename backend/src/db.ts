@@ -14,7 +14,9 @@ const poolConfig: mysql.PoolOptions = {
   database: process.env.DB_NAME || 'test_db',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  // Use UTC for date/time values so all services interpret timestamps the same
+  timezone: 'Z'
 };
 
 // Add SSL configuration if CA certificate is provided
