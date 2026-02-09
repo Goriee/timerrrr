@@ -401,7 +401,17 @@ export default function BossListClient() {
                 <div className="pt-4 mt-auto border-t border-white/5">
                   {boss.nextSpawnAt ? (
                     <div className="mb-4">
-                      <div className="text-xs text-slate-400 mb-1 font-medium uppercase tracking-wide">Next Spawn</div>
+                      <div className="flex justify-between items-end mb-1">
+                        <div className="text-xs text-slate-400 font-medium uppercase tracking-wide">Time Remaining</div>
+                         <div className="text-xs text-slate-400 font-mono">
+                          {new Date(boss.nextSpawnAt).toLocaleString([], {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      </div>
                       <LiveTimer boss={boss} />
                     </div>
                   ) : (
