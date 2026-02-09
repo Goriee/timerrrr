@@ -9,8 +9,8 @@ async function updateBosses() {
     console.log('Starting boss update...');
     
     // Clear existing bosses
-    await connection.query('DELETE FROM bosses');
-    console.log('✓ Cleared existing bosses');
+    // await connection.query('DELETE FROM bosses');
+    // console.log('✓ Cleared existing bosses');
 
     // Your actual boss list
     const bosses = [
