@@ -7,6 +7,16 @@ async function updateBosses() {
   try {
     connection = await pool.getConnection();
     console.log('Starting boss update...');
+
+    // Remove duplicates keeping the lowest ID (safeguard)
+    await connection.query(`
+      DELETE t1 FROM bosses t1
+      INNER JOIN bosses t2 
+      WHERE 
+          t1.id > t2.id AND 
+          t1.name = t2.name
+    `);
+    console.log('✓ Removed duplicate bosses');
     
     // Clear existing bosses
     // await connection.query('DELETE FROM bosses');
