@@ -124,6 +124,9 @@ export default function CalendarPage() {
             minute: '2-digit',
             hour12: true,
           }}
+          dayMaxEvents={true}
+          eventDisplay="block"
+          eventClassNames="cursor-pointer hover:opacity-90 transition-opacity text-xs truncate mb-1"
         />
       </div>
 
