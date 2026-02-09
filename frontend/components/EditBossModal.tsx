@@ -81,11 +81,32 @@ export default function EditBossModal({
   };
 
   const handleAutoCalculate = () => {
-    if (lastKillAt && respawnHours) {
-      // Parse the local datetime input as a Date object
-      const killDate = new Date(lastKillAt);
+    if (respawnHours) {
+      let killDate: Date;
       
-      // Add respawn hours to get spawn time
+      if (lastKillAt) {
+        // Use the provided last kill time
+        killDate = new Date(lastKillAt);
+      } else if (nextSpawnAt) {
+        // If no last kill time but we have next spawn, calculate backwards
+        // Assume boss was killed right when it spawned (common scenario when updating missed kills)
+        const spawnDate = new Date(nextSpawnAt);
+        killDate = new Date(spawnDate.getTime() - (respawnHours * 60 * 60 * 1000));
+        
+        // Set the calculated kill time in the input
+        const year = killDate.getFullYear();
+        const month = String(killDate.getMonth() + 1).padStart(2, '0');
+        const day = String(killDate.getDate()).padStart(2, '0');
+        const hours = String(killDate.getHours()).padStart(2, '0');
+        const minutes = String(killDate.getMinutes()).padStart(2, '0');
+        setLastKillAt(`${year}-${month}-${day}T${hours}:${minutes}`);
+        return; // nextSpawnAt already set, no need to recalculate
+      } else {
+        // No data at all, cannot calculate
+        return;
+      }
+      
+      // Calculate next spawn time from kill time
       const spawnDate = new Date(killDate.getTime() + (respawnHours * 60 * 60 * 1000));
       
       // Format to datetime-local input format
@@ -173,7 +194,7 @@ export default function EditBossModal({
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              Click Auto to calculate from last kill time
+              Click Auto to calculate from last kill time, or calculate backwards from spawn time if kill time is empty
             </p>
           </div>
 
