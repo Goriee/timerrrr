@@ -4,13 +4,19 @@ import { useState, useEffect } from 'react';
 import { Boss, UpdateBossInput } from '@/types';
 import { formatDateTime } from '@/lib/utils';
 
-// Helper to convert a UTC date string to a local datetime-local input string (YYYY-MM-DDThh:mm)
-function toLocalInputString(dateStr: string | Date | null | undefined): string {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  const offset = date.getTimezoneOffset() * 60000;
-  const localDate = new Date(date.getTime() - offset);
-  return localDate.toISOString().slice(0, 16);
+// Helper to convert a Date object or string to a local datetime-local input string (YYYY-MM-DDThh:mm)
+function toLocalInputString(dateInput: string | Date | null | undefined): string {
+  if (!dateInput) return '';
+  const date = new Date(dateInput);
+  
+  // Manual formatting to strictly preserve Local Time components
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
 interface EditBossModalProps {
@@ -71,16 +77,19 @@ export default function EditBossModal({
   };
 
   const handleAutoCalculate = () => {
-    if (lastKillAt) {
-      const kill = new Date(lastKillAt);
-      // Create a new date object to avoid mutating the original
-      const spawn = new Date(kill.getTime());
+    if (lastKillAt && respawnHours) {
+      // lastKillAt is "YYYY-MM-DDTHH:mm" (Local String from Input)
+      // new Date(lastKillAt) parses this as Local Time
+      const killDate = new Date(lastKillAt);
       
-      // Add respawn hours
-      spawn.setTime(spawn.getTime() + (respawnHours * 60 * 60 * 1000));
+      // Calculate spawn timestamp (Local Time + Hours)
+      const spawnTimestamp = killDate.getTime() + (respawnHours * 60 * 60 * 1000);
       
-      // Use helper to format correctly for local input
-      setNextSpawnAt(toLocalInputString(spawn));
+      // Create new Date object for the calculated time
+      const spawnDate = new Date(spawnTimestamp);
+      
+      // Format back to Local Input String
+      setNextSpawnAt(toLocalInputString(spawnDate));
     }
   };
 
