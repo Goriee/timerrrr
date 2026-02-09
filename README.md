@@ -1,103 +1,203 @@
-# Guild Boss Timer
+# Guild Boss Timer & Discord Bot# Guild Boss Timer
 
-A full-stack application for tracking guild boss respawn timers with live countdowns, manual time editing, and calendar visualization.
 
-## 🎮 Features
 
-- **Live Countdown Timers** - Real-time countdown to next boss spawn
-- **Manual Time Editing** - Password-protected admin controls
-- **Calendar View** - Monthly/weekly visualization using FullCalendar
-- **Boss Management** - Track multiple bosses with different respawn times
-- **Attack Type Filtering** - Filter by melee/magic attack types
-- **Location Filtering** - Filter bosses by location
+A full-stack application and Discord bot for tracking guild boss respawn timers with live countdowns, manual time editing, calendar visualization, and Discord integration.A full-stack application for tracking guild boss respawn timers with live countdowns, manual time editing, and calendar visualization.
+
+
+
+## 🚀 Features## 🎮 Features
+
+
+
+### Website- **Live Countdown Timers** - Real-time countdown to next boss spawn
+
+- **Live Countdowns**: Real-time timers for next boss spawns.- **Manual Time Editing** - Password-protected admin controls
+
+- **Calendar View**: Monthly/weekly visualization of upcoming spawns.- **Calendar View** - Monthly/weekly visualization using FullCalendar
+
+- **Admin Controls**: Password-protected actions to mark kills or edit times.- **Boss Management** - Track multiple bosses with different respawn times
+
+- **Persistent Login**: Browser-based session persistence.- **Attack Type Filtering** - Filter by melee/magic attack types
+
+- **Auto-Calc**: Bidirectional time calculation (Input Spawn Time -> Auto-calc Time Remaining).- **Location Filtering** - Filter bosses by location
+
 - **Responsive Design** - Mobile-friendly interface
-- **Auto-Refresh** - Automatic sync every minute
-- **Visual Alerts** - Color-coded timers (red < 10min, yellow < 1hr)
 
-## 🏗️ Tech Stack
+### Discord Bot- **Auto-Refresh** - Automatic sync every minute
 
-### Frontend
+- **!bosslist**: Displays a live-updated list of all bosses and their status/timers with relative time (e.g., "45m").- **Visual Alerts** - Color-coded timers (red < 10min, yellow < 1hr)
+
+- **!kill [BossName]**: Marks a boss as killed and auto-schedules the next spawn using Discord timestamps.
+
+- **Timezone Sync**: All times are synced uniformly across Website and Discord (UTC backend).## 🏗️ Tech Stack
+
+
+
+## 🛠️ Tech Stack### Frontend
+
 - **Next.js 14** with TypeScript
-- **App Router** for routing
-- **Tailwind CSS** for styling
-- **FullCalendar** for calendar view
-- **Axios** for API calls
 
-### Backend
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, FullCalendar- **App Router** for routing
+
+- **Backend API**: Node.js, Express, MySQL (Aiven)- **Tailwind CSS** for styling
+
+- **Discord Bot**: discord.js v14, Node.js- **FullCalendar** for calendar view
+
+- **Services**: Render (Backend & Bot hosting), Vercel (Frontend hosting), UptimeRobot (Keep-alive)- **Axios** for API calls
+
+
+
+## 📂 Project Structure### Backend
+
 - **Node.js** with TypeScript
-- **Express** web framework
-- **MySQL** (Aiven Database)
-- **bcrypt** for password hashing
 
-## 📁 Project Structure
+```bash- **Express** web framework
 
-```
-finaltimer/
-├── backend/
-│   ├── src/
+finaltimer/- **MySQL** (Aiven Database)
+
+├── backend/          # Express API Server- **bcrypt** for password hashing
+
+│   └── src/index.ts
+
+├── frontend/         # Next.js Web App## 📁 Project Structure
+
+│   └── app/page.tsx
+
+└── discord-bot/      # Discord Bot Service```
+
+    ├── src/index.tsfinaltimer/
+
+    └── src/commands.ts├── backend/
+
+```│   ├── src/
+
 │   │   ├── index.ts       # Main server file
-│   │   ├── db.ts          # Database connection
+
+## ⚡ Quick Start│   │   ├── db.ts          # Database connection
+
 │   │   ├── migrate.ts     # Database migration
-│   │   └── types.ts       # TypeScript types
-│   ├── package.json
+
+### 1. Database Setup│   │   └── types.ts       # TypeScript types
+
+Create a MySQL database (e.g., Aiven or local) and ensure the `bosses` table is created.│   ├── package.json
+
 │   ├── tsconfig.json
-│   └── .env.example
-│
+
+### 2. Environment Variables│   └── .env.example
+
+Create `.env` files in each service directory:│
+
 └── frontend/
-    ├── app/
-    │   ├── page.tsx           # Home page (boss list)
-    │   ├── layout.tsx         # Root layout
-    │   ├── globals.css        # Global styles
-    │   └── calendar/
-    │       └── page.tsx       # Calendar view
-    ├── components/
-    │   ├── LiveTimer.tsx      # Live countdown component
-    │   ├── PasswordModal.tsx  # Password authentication
-    │   └── EditBossModal.tsx  # Boss editing modal
-    ├── lib/
-    │   ├── api.ts             # API client
+
+**backend/.env** & **discord-bot/.env**    ├── app/
+
+```env    │   ├── page.tsx           # Home page (boss list)
+
+DB_HOST=your-db-host    │   ├── layout.tsx         # Root layout
+
+DB_USER=your-db-user    │   ├── globals.css        # Global styles
+
+DB_PASSWORD=your-db-pass    │   └── calendar/
+
+DB_NAME=defaultdb    │       └── page.tsx       # Calendar view
+
+DB_PORT=3306    ├── components/
+
+# Only for Backend    │   ├── LiveTimer.tsx      # Live countdown component
+
+PORT=3001    │   ├── PasswordModal.tsx  # Password authentication
+
+# Only for Discord Bot    │   └── EditBossModal.tsx  # Boss editing modal
+
+DISCORD_BOT_TOKEN=your-token    ├── lib/
+
+```    │   ├── api.ts             # API client
+
     │   └── utils.ts           # Utility functions
-    ├── types/
+
+### 3. Run Locally    ├── types/
+
     │   └── index.ts           # TypeScript types
-    ├── package.json
-    ├── tsconfig.json
-    ├── tailwind.config.js
-    └── next.config.js
+
+**Backend:**    ├── package.json
+
+```bash    ├── tsconfig.json
+
+cd backend    ├── tailwind.config.js
+
+npm install    └── next.config.js
+
+npm run dev```
+
 ```
 
 ## 🚀 Local Development Setup
 
-### Prerequisites
-- Node.js 18+ 
-- MySQL database (Aiven)
-- npm or yarn
+**Discord Bot:**
+
+```bash### Prerequisites
+
+cd discord-bot- Node.js 18+ 
+
+npm install- MySQL database (Aiven)
+
+npm run dev- npm or yarn
+
+```
 
 ### Backend Setup
 
-1. Navigate to backend folder:
-```bash
-cd backend
+**Frontend:**
+
+```bash1. Navigate to backend folder:
+
+cd frontend```bash
+
+npm installcd backend
+
+npm run dev```
+
 ```
 
 2. Install dependencies:
-```bash
+
+## 🤖 Discord Commands```bash
+
 npm install
-```
 
-3. Create `.env` file:
-```bash
+| Command | Description |```
+
+|---|---|
+
+| `!bosslist` | Shows status of all bosses with relative time remaining. |3. Create `.env` file:
+
+| `!kill [name]` | Marks a boss as killed. Ex: `!kill Viorent`. Case-insensitive. |```bash
+
 cp .env.example .env
-```
 
-4. Update `.env` with your Aiven MySQL credentials:
-```env
-# Server Configuration
-PORT=3001
-NODE_ENV=production
+## ☁️ Deployment```
 
-# Database Configuration (MySQL on Aiven)
+
+
+- **Backend & Bot**: Deploy as Web Services on Render.4. Update `.env` with your Aiven MySQL credentials:
+
+  - The Project is configured to use UTC (`timezone: 'Z'`) for database connections to ensure consistency.```env
+
+  - The Bot includes a small Express server on port 3000 (or `PORT`) exposing `/health` so it can be hosted as a Web Service.# Server Configuration
+
+- **Frontend**: Deploy to Vercel/Netlify.PORT=3001
+
+  - Configure `NEXT_PUBLIC_API_URL` environment variable if needed (or check `lib/api.ts` for configuration).NODE_ENV=production
+
+
+
+## 🛡️ License# Database Configuration (MySQL on Aiven)
+
 DB_HOST=mysql-example.aivencloud.com
-DB_PORT=12345
+
+This project is open source.DB_PORT=12345
+
 DB_USER=avnadmin
 DB_PASSWORD=admin_password
 DB_NAME=defaultdb

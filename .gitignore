@@ -1,5 +1,6 @@
 # Backend configuration
 backend/.env
+discord-bot/.env
 
 # Frontend configuration
 frontend/.env.local
