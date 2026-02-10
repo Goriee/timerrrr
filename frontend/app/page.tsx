@@ -7,8 +7,59 @@ import { bossApi } from '@/lib/api';
 import LiveTimer from '@/components/LiveTimer';
 import EditBossModal from '@/components/EditBossModal';
 
+// Fixed Schedule Data (Monday=1, ..., Sunday=0)
+const FIXED_SCHEDULE_DATA = [
+  { d: 1, t: '11:30', n: 'Clemantis' }, { d: 1, t: '19:00', n: 'Thymele' },
+  { d: 2, t: '11:30', n: 'Saphirus' }, { d: 2, t: '19:00', n: 'Neutro' },
+  { d: 3, t: '11:30', n: 'Thymele' }, { d: 3, t: '21:00', n: 'Auraq' },
+  { d: 4, t: '11:30', n: 'Neutro' }, { d: 4, t: '19:00', n: 'Clemantis' },
+  { d: 5, t: '19:00', n: 'Roderick' }, { d: 5, t: '22:00', n: 'Auraq' },
+  { d: 6, t: '15:00', n: 'Milavy' }, { d: 6, t: '17:00', n: 'Ringor' }, { d: 6, t: '22:00', n: 'Chaiflock' },
+  { d: 0, t: '17:00', n: 'Saphirus' }, { d: 0, t: '21:00', n: 'Benji' },
+];
+
+const getNextFixedSpawn = (bossName: string) => {
+  const slots = FIXED_SCHEDULE_DATA.filter(s => bossName.includes(s.n));
+  if (slots.length === 0) return null;
+
+  const now = new Date();
+  // Fixed UTC+8 for Philippines Time
+  const phtOffset = 8 * 60 * 60 * 1000; 
+  const nowPHT = new Date(now.getTime() + phtOffset);
+  
+  let bestDate: Date | null = null;
+  let minDiff = Infinity;
+
+  slots.forEach(slot => {
+    const [h, m] = slot.t.split(':').map(Number);
+    const targetPHT = new Date(Date.UTC(nowPHT.getUTCFullYear(), nowPHT.getUTCMonth(), nowPHT.getUTCDate(), h, m, 0));
+    const currentDayIndex = nowPHT.getUTCDay();
+    let daysDiff = (slot.d - currentDayIndex + 7) % 7;
+    
+    // If today and passed, add 7 days
+    if (daysDiff === 0 && targetPHT.getTime() < nowPHT.getTime() + 1000) { // +1s buffer
+       daysDiff = 7;
+    }
+    targetPHT.setUTCDate(targetPHT.getUTCDate() + daysDiff);
+    
+    // Convert back to real UTC timestamp
+    const realUtcTime = new Date(targetPHT.getTime() - phtOffset);
+    const diff = realUtcTime.getTime() - now.getTime();
+    
+    if (diff < minDiff) {
+       minDiff = diff;
+       bestDate = realUtcTime;
+    }
+  });
+  return bestDate ? bestDate.toISOString() : null;
+};
+
+// Returns true if boss is in fixed schedule
+const isFixedBoss = (name: string) => FIXED_SCHEDULE_DATA.some(f => name.includes(f.n));
+
 export default function BossListClient() {
   const [bosses, setBosses] = useState<Boss[]>([]);
+  const [fixedBosses, setFixedBosses] = useState<Boss[]>([]);
   const [filteredBosses, setFilteredBosses] = useState<Boss[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -37,7 +88,36 @@ export default function BossListClient() {
   const fetchBosses = useCallback(async () => {
     try {
       const data = await bossApi.getAllBosses();
-      setBosses(data);
+      
+      // Separate Dynamic (DB) from Fixed
+      const dynamic = data.filter(b => !isFixedBoss(b.name));
+      setBosses(dynamic);
+
+      // Generate Fixed Schedule Bosses
+      const uniqueFixedNames = Array.from(new Set(FIXED_SCHEDULE_DATA.map(s => s.n)));
+      const generatedFixed: Boss[] = uniqueFixedNames.map((name, idx) => {
+          const existing = data.find(b => b.name === name);
+          return {
+              id: existing ? existing.id : -9000 - idx, // Negative IDs for local
+              name: name,
+              level: existing ? existing.level : 0,
+              location: existing ? existing.location : 'Fixed Event',
+              attackType: existing ? existing.attackType : 'melee',
+              respawnHours: 0,
+              lastKillAt: null,
+              nextSpawnAt: getNextFixedSpawn(name),
+              isScheduled: true
+          };
+      });
+      
+      // Sort by soonest
+      generatedFixed.sort((a,b) => {
+          if (!a.nextSpawnAt) return 1;
+          if (!b.nextSpawnAt) return -1;
+          return new Date(a.nextSpawnAt).getTime() - new Date(b.nextSpawnAt).getTime();
+      });
+
+      setFixedBosses(generatedFixed);
       setLoading(false);
     } catch (err) {
       setError('Failed to load bosses');
@@ -75,8 +155,9 @@ export default function BossListClient() {
 
   const locations = [...new Set(bosses.map((b) => b.location))].sort();
 
-  // Find nearest upcoming boss
-  const nearestBoss = bosses
+  // Find nearest upcoming boss (checking both dynamic and fixed lists)
+  const allForNearest = [...bosses, ...fixedBosses];
+  const nearestBoss = allForNearest
     .filter(b => b.nextSpawnAt && new Date(b.nextSpawnAt).getTime() > new Date().getTime())
     .sort((a, b) => new Date(a.nextSpawnAt!).getTime() - new Date(b.nextSpawnAt!).getTime())[0];
 
@@ -363,6 +444,51 @@ export default function BossListClient() {
             </div>
           </div>
         </div>
+
+        {/* Fixed Event Schedule */}
+        {fixedBosses.length > 0 && (
+          <div className="mb-12">
+            <h3 className="text-xl font-bold text-slate-200 mb-6 pl-2 border-l-4 border-yellow-500/50 flex items-center gap-3">
+              <span className="text-2xl">📅</span> Fixed Event Schedule
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {fixedBosses.map((boss) => (
+                <div key={boss.id} className="group bg-slate-800/30 backdrop-blur-md rounded-2xl p-1 border border-white/5 hover:border-yellow-500/30 hover:bg-slate-800/50 transition-all duration-300 relative overflow-hidden">
+                   {/* Card Gradient */}
+                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 via-yellow-500/0 to-orange-500/0 group-hover:via-yellow-500/5 transition-all duration-500" />
+                   
+                   <div className="p-5 relative z-10 h-full flex flex-col">
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-xl font-bold text-slate-100 group-hover:text-yellow-200 transition-colors">{boss.name}</h3>
+                        <span className="px-2 py-1 bg-yellow-500/10 text-yellow-200 border border-yellow-500/20 rounded text-xs font-semibold">Fixed</span>
+                      </div>
+                      
+                      <div className="pt-4 mt-auto border-t border-white/5">
+                        {boss.nextSpawnAt ? (
+                          <div className="mb-4">
+                            <div className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-1">Time Remaining</div>
+                            <div className="text-2xl font-mono text-yellow-100 font-bold tracking-tight">
+                              <LiveTimer boss={boss} />
+                            </div>
+                            <div className="mt-2 text-xs text-slate-500 flex items-center gap-1">
+                               <span>📅</span>
+                               {new Date(boss.nextSpawnAt).toLocaleString([], { weekday:'short', hour:'2-digit', minute:'2-digit' })}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-slate-500 italic">No scheduled spawn</div>
+                        )}
+                      </div>
+                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <h3 className="text-xl font-bold text-slate-200 mb-6 pl-2 border-l-4 border-purple-500/50 flex items-center gap-3">
+          <span className="text-2xl">⚔️</span> Field Bosses
+        </h3>
 
         {/* Boss Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
