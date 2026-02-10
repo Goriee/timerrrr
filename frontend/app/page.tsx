@@ -51,7 +51,8 @@ const getNextFixedSpawn = (bossName: string) => {
        bestDate = realUtcTime;
     }
   });
-  return bestDate ? bestDate.toISOString() : null;
+  
+  return bestDate ? (bestDate as Date).toISOString() : null;
 };
 
 // Returns true if boss is in fixed schedule
