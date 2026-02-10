@@ -57,12 +57,24 @@ export async function handleAllBossesCommand(message: Message) {
       return;
     }
 
+    // List of fixed spawn bosses to exclude from the main list
+    const fixedBosses = [
+      'Clemantis', 'Thymele', 'Saphirus', 'Neutro', 
+      'Auraq', 'Roderick', 'Milavy', 'Ringor', 
+      'Chaiflock', 'Benji'
+    ];
+
+    // Filter out fixed bosses (case-insensitive check)
+    const dynamicBosses = rows.filter(b => 
+        !fixedBosses.some(fb => b.name.toLowerCase().includes(fb.toLowerCase()))
+    );
+
     // Header for the table
     const header = `   BOSS NAME    | LVL | INT.     | EST. IN`;
     const separator = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
     
     // Formatting helper
-    const bossListLines = rows.map((b) => {
+    const bossListLines = dynamicBosses.map((b) => {
       const name = (b.name || "").substring(0, 12).padEnd(12, ' ');
       const level = String(b.level || "??").padStart(3, ' ');
       const respawn = (b.respawn_hours + "h").padEnd(8, ' ');
@@ -92,117 +104,111 @@ export async function handleAllBossesCommand(message: Message) {
         if (d > 0) nextSpawn = `${sign}${d}d ${h}h`;
         else if (h > 0) nextSpawn = `${sign}${h}h ${m}m`;
         else nextSpawn = `${sign}${m}m`;
-        
-        // Pad for alignment, approximate length 8-10 chars
-        // But since it's the last column, strict padding isn't as critical, 
-        // essentially aligning the start is enough. 
-        // We can just return it as is.
       }
 
       return `${icon} ${name} | ${level} | ${respawn} | ${nextSpawn}`;
     });
 
-    // Create an embed to fit more content (up to 4096 chars in description)
+    // Create main embed
     const allRows = bossListLines.join('\n');
-    const tableContent = `\`\`\`text\n${header}\n${separator}\n${allRows}\n\`\`\``;
+    const tableContent = bossListLines.length > 0 
+        ? `\`\`\`text\n${header}\n${separator}\n${allRows}\n\`\`\``
+        : `*No active field bosses tracked.*`;
 
-    if (tableContent.length > 4096) {
-        // Fallback to chunking if it really exceeds even the embed limit (very huge lists)
-        const chunkSize = 15;
-        for (let i = 0; i < bossListLines.length; i += chunkSize) {
-            const chunk = bossListLines.slice(i, i + chunkSize);
-            await message.reply(`**All Bosses (Part ${Math.floor(i/chunkSize) + 1})**\n\`\`\`text\n${header}\n${separator}\n${chunk.join('\n')}\n\`\`\``);
+    // 1. Send Main Boss List Embed
+    const mainEmbed = new EmbedBuilder()
+        .setTitle('All Bosses')
+        .setDescription(tableContent)
+        .setColor(0x2B2D31); // Discord dark theme color
+
+    // Fixed Schedule Configuration
+    const scheduleData = [
+        { 
+            dayName: 'Monday', dayIndex: 1, 
+            events: [
+                { time: '11:30', name: 'Clemantis (Lvl 70)' },
+                { time: '19:00', name: 'Thymele (Lvl 85)' }
+            ] 
+        },
+        { 
+            dayName: 'Tuesday', dayIndex: 2, 
+            events: [
+                { time: '11:30', name: 'Saphirus (Lvl 80)' },
+                { time: '19:00', name: 'Neutro (Lvl 80)' }
+            ] 
+        },
+        { 
+            dayName: 'Wednesday', dayIndex: 3, 
+            events: [
+                { time: '11:30', name: 'Thymele (Lvl 85)' },
+                { time: '21:00', name: 'Auraq (Lvl 100)' }
+            ] 
+        },
+        { 
+            dayName: 'Thursday', dayIndex: 4, 
+            events: [
+                { time: '11:30', name: 'Neutro (Lvl 80)' },
+                { time: '19:00', name: 'Clemantis (Lvl 70)' }
+            ] 
+        },
+        { 
+            dayName: 'Friday', dayIndex: 5, 
+            events: [
+                { time: '19:00', name: 'Roderick (Lvl 95)' },
+                { time: '22:00', name: 'Auraq (Lvl 100)' }
+            ] 
+        },
+        { 
+            dayName: 'Saturday', dayIndex: 6, 
+            events: [
+                { time: '15:00', name: 'Milavy (Lvl 90)' },
+                { time: '17:00', name: 'Ringor (Lvl 95)' },
+                { time: '22:00', name: 'Chaiflock (Lvl 120)' }
+            ] 
+        },
+        { 
+            dayName: 'Sunday', dayIndex: 0, 
+            events: [
+                { time: '17:00', name: 'Saphirus (Lvl 80)' },
+                { time: '21:00', name: 'Benji (Lvl 120)' }
+            ] 
         }
-    } else {
-        const embed = new EmbedBuilder()
-            .setTitle('All Bosses')
-            .setDescription(tableContent)
-            .setColor(0x2B2D31); // Discord dark theme color
+    ];
 
-        // Fixed Schedule Configuration
-        const scheduleData = [
-            { 
-                dayName: 'Monday', dayIndex: 1, 
-                events: [
-                    { time: '11:30', name: 'Clemantis (Lvl 70)' },
-                    { time: '19:00', name: 'Thymele (Lvl 85)' }
-                ] 
-            },
-            { 
-                dayName: 'Tuesday', dayIndex: 2, 
-                events: [
-                    { time: '11:30', name: 'Saphirus (Lvl 80)' },
-                    { time: '19:00', name: 'Neutro (Lvl 80)' }
-                ] 
-            },
-            { 
-                dayName: 'Wednesday', dayIndex: 3, 
-                events: [
-                    { time: '11:30', name: 'Thymele (Lvl 85)' },
-                    { time: '21:00', name: 'Auraq (Lvl 100)' }
-                ] 
-            },
-            { 
-                dayName: 'Thursday', dayIndex: 4, 
-                events: [
-                    { time: '11:30', name: 'Neutro (Lvl 80)' },
-                    { time: '19:00', name: 'Clemantis (Lvl 70)' }
-                ] 
-            },
-            { 
-                dayName: 'Friday', dayIndex: 5, 
-                events: [
-                    { time: '19:00', name: 'Roderick (Lvl 95)' },
-                    { time: '22:00', name: 'Auraq (Lvl 100)' }
-                ] 
-            },
-            { 
-                dayName: 'Saturday', dayIndex: 6, 
-                events: [
-                    { time: '15:00', name: 'Milavy (Lvl 90)' },
-                    { time: '17:00', name: 'Ringor (Lvl 95)' },
-                    { time: '22:00', name: 'Chaiflock (Lvl 120)' }
-                ] 
-            },
-            { 
-                dayName: 'Sunday', dayIndex: 0, 
-                events: [
-                    { time: '17:00', name: 'Saphirus (Lvl 80)' },
-                    { time: '21:00', name: 'Benji (Lvl 120)' }
-                ] 
+    // Generate dynamic schedule text
+    const fixedScheduleText = scheduleData.map(day => {
+        const eventLines = day.events.map(ev => {
+            const now = new Date();
+            const [h, m] = ev.time.split(':').map(Number);
+            
+            // Construct target date (UTC)
+            const target = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), h, m, 0));
+            
+            const currentDay = now.getUTCDay();
+            let daysDiff = (day.dayIndex - currentDay + 7) % 7;
+
+            // Adjust for past times today
+            if (daysDiff === 0 && target.getTime() < now.getTime()) {
+                daysDiff = 7;
             }
-        ];
+            
+            target.setUTCDate(target.getUTCDate() + daysDiff);
+            const unix = Math.floor(target.getTime() / 1000);
 
-        // Generate dynamic schedule text
-        const fixedScheduleText = scheduleData.map(day => {
-            const eventLines = day.events.map(ev => {
-                const now = new Date();
-                const [h, m] = ev.time.split(':').map(Number);
-                
-                // Construct target date (UTC)
-                const target = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), h, m, 0));
-                
-                const currentDay = now.getUTCDay();
-                let daysDiff = (day.dayIndex - currentDay + 7) % 7;
+            return `${ev.time} — ${ev.name} (<t:${unix}:R>)`;
+        }).join('\n');
 
-                // Adjust for past times today
-                if (daysDiff === 0 && target.getTime() < now.getTime()) {
-                    daysDiff = 7;
-                }
-                
-                target.setUTCDate(target.getUTCDate() + daysDiff);
-                const unix = Math.floor(target.getTime() / 1000);
+        return `**${day.dayName}**\n${eventLines}`;
+    }).join('\n\n');
 
-                return `${ev.time} — ${ev.name} (<t:${unix}:R>)`;
-            }).join('\n');
+    // 2. Create SEPARATE Fixed Schedule Embed
+    const fixedEmbed = new EmbedBuilder()
+        .setTitle('📅 Fixed Event Schedule')
+        .setDescription(fixedScheduleText)
+        .setColor(0x00A2E8); // Different color for distinction
 
-            return `**${day.dayName}**\n${eventLines}`;
-        }).join('\n\n');
-
-        embed.addFields({ name: '📅 Fixed Event Schedule', value: fixedScheduleText });
-
-        await message.reply({ embeds: [embed] });
-    }
+    // Send both embeds in one message
+    await message.reply({ embeds: [mainEmbed, fixedEmbed] });
 
   } catch (error) {
     console.error(error);
