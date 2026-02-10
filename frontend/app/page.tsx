@@ -62,6 +62,8 @@ export default function BossListClient() {
   const [bosses, setBosses] = useState<Boss[]>([]);
   const [fixedBosses, setFixedBosses] = useState<Boss[]>([]);
   const [filteredBosses, setFilteredBosses] = useState<Boss[]>([]);
+  const [activeTab, setActiveTab] = useState<'field' | 'fixed'>('field');
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -318,6 +320,29 @@ export default function BossListClient() {
               </div>
             </div>
             <div className="flex gap-3">
+               <button
+                onClick={() => setActiveTab('field')}
+                className={`px-4 py-2 rounded-lg transition-all duration-200 border flex items-center gap-2 ${
+                  activeTab === 'field' 
+                  ? 'bg-purple-500/20 text-purple-200 border-purple-500/40' 
+                  : 'bg-transparent text-slate-400 border-transparent hover:bg-white/5'
+                }`}
+              >
+                <span>⚔️</span> <span className="hidden sm:inline">Field</span>
+              </button>
+               <button
+                onClick={() => setActiveTab('fixed')}
+                className={`px-4 py-2 rounded-lg transition-all duration-200 border flex items-center gap-2 ${
+                  activeTab === 'fixed' 
+                  ? 'bg-yellow-500/20 text-yellow-200 border-yellow-500/40' 
+                  : 'bg-transparent text-slate-400 border-transparent hover:bg-white/5'
+                }`}
+              >
+                <span>📅</span> <span className="hidden sm:inline">Fixed</span>
+              </button>
+
+              <div className="w-px h-8 bg-white/10 mx-1" />
+
               <Link
                 href="/calendar"
                 className="bg-purple-500/10 hover:bg-purple-500/20 text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 border border-purple-500/20 hover:border-purple-500/40 flex items-center gap-2"
@@ -391,7 +416,8 @@ export default function BossListClient() {
           </div>
         )}
 
-        {/* Stats & Filters */}
+        {/* Stats & Filters (Field Tab) */}
+        {activeTab === 'field' && (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
           {/* Stats Card */}
           <div className="bg-slate-800/40 backdrop-blur-md rounded-2xl p-6 border border-white/5 shadow-xl relative overflow-hidden group">
@@ -445,10 +471,11 @@ export default function BossListClient() {
             </div>
           </div>
         </div>
+        )}
 
-        {/* Fixed Event Schedule */}
-        {fixedBosses.length > 0 && (
-          <div className="mb-12">
+        {/* Fixed Event Schedule (Fixed Tab) */}
+        {activeTab === 'fixed' && fixedBosses.length > 0 && (
+          <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h3 className="text-xl font-bold text-slate-200 mb-6 pl-2 border-l-4 border-yellow-500/50 flex items-center gap-3">
               <span className="text-2xl">📅</span> Fixed Event Schedule
             </h3>
@@ -487,93 +514,98 @@ export default function BossListClient() {
           </div>
         )}
 
-        <h3 className="text-xl font-bold text-slate-200 mb-6 pl-2 border-l-4 border-purple-500/50 flex items-center gap-3">
-          <span className="text-2xl">⚔️</span> Field Bosses
-        </h3>
+        {/* Field Bosses (Field Tab) */}
+        {activeTab === 'field' && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <h3 className="text-xl font-bold text-slate-200 mb-6 pl-2 border-l-4 border-purple-500/50 flex items-center gap-3">
+            <span className="text-2xl">⚔️</span> Field Bosses
+          </h3>
 
-        {/* Boss Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredBosses.map((boss) => (
-            <div
-              key={boss.id}
-              className="group bg-slate-800/30 backdrop-blur-md rounded-2xl p-1 border border-white/5 hover:border-purple-500/30 hover:bg-slate-800/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-900/20 hover:-translate-y-1 relative overflow-hidden"
-            >
-              {/* Card Gradient Border Effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-purple-500/0 to-blue-500/0 group-hover:via-purple-500/10 transition-all duration-500" />
+          {/* Boss Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredBosses.map((boss) => (
+              <div
+                key={boss.id}
+                className="group bg-slate-800/30 backdrop-blur-md rounded-2xl p-1 border border-white/5 hover:border-purple-500/30 hover:bg-slate-800/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-900/20 hover:-translate-y-1 relative overflow-hidden"
+              >
+                {/* Card Gradient Border Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-purple-500/0 to-blue-500/0 group-hover:via-purple-500/10 transition-all duration-500" />
 
-              <div className="p-5 relative z-10 h-full flex flex-col">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-100 mb-1 group-hover:text-purple-200 transition-colors">{boss.name}</h3>
-                    <div className="flex gap-2 text-xs font-semibold">
-                      <span className={`px-2 py-1 rounded-md border ${
-                        boss.attackType === 'melee' 
-                          ? 'bg-orange-500/10 text-orange-200 border-orange-500/20' 
-                          : 'bg-blue-500/10 text-blue-200 border-blue-500/20'
-                      }`}>
-                        {boss.attackType === 'melee' ? '⚔️' : '✨'} {boss.attackType}
-                      </span>
-                      <span className="px-2 py-1 bg-slate-700/50 text-slate-300 rounded-md border border-slate-600/50">
-                        Lv {boss.level}
-                      </span>
-                    </div>
-                  </div>
-                  {/* Status Indicator Dot */}
-                  <div className="w-3 h-3 rounded-full bg-slate-700 shadow-inner group-hover:bg-purple-500/50 transition-colors" />
-                </div>
-
-                <div className="space-y-3 mb-6 flex-grow">
-                  <div className="flex items-center gap-2 text-sm text-slate-400">
-                    <span className="text-base">📍</span>
-                    <span className="font-medium text-slate-300">{boss.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-400">
-                    <span className="text-base">⏱️</span>
-                    <span>Respawn: <span className="text-slate-300">{boss.respawnHours}h</span></span>
-                  </div>
-                </div>
-                
-                <div className="pt-4 mt-auto border-t border-white/5">
-                  {boss.nextSpawnAt ? (
-                    <div className="mb-4">
-                      <div className="flex justify-between items-end mb-1">
-                        <div className="text-xs text-slate-400 font-medium uppercase tracking-wide">Time Remaining</div>
-                         <div className="text-xs text-slate-400 font-mono">
-                          {new Date(boss.nextSpawnAt).toLocaleString([], {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
+                <div className="p-5 relative z-10 h-full flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-100 mb-1 group-hover:text-purple-200 transition-colors">{boss.name}</h3>
+                      <div className="flex gap-2 text-xs font-semibold">
+                        <span className={`px-2 py-1 rounded-md border ${
+                          boss.attackType === 'melee' 
+                            ? 'bg-orange-500/10 text-orange-200 border-orange-500/20' 
+                            : 'bg-blue-500/10 text-blue-200 border-blue-500/20'
+                        }`}>
+                          {boss.attackType === 'melee' ? '⚔️' : '✨'} {boss.attackType}
+                        </span>
+                        <span className="px-2 py-1 bg-slate-700/50 text-slate-300 rounded-md border border-slate-600/50">
+                          Lv {boss.level}
+                        </span>
                       </div>
-                      <LiveTimer boss={boss} />
                     </div>
-                  ) : (
-                    <div className="mb-4 text-amber-300 font-semibold flex items-center gap-2 bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
-                      <span>⏳</span> Not Scheduled
-                    </div>
-                  )}
+                    {/* Status Indicator Dot */}
+                    <div className="w-3 h-3 rounded-full bg-slate-700 shadow-inner group-hover:bg-purple-500/50 transition-colors" />
+                  </div>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEdit(boss)}
-                      className="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-300 py-2 pl-2 pr-3 rounded-lg text-sm font-medium transition-all duration-200 border border-white/5 hover:border-white/20 flex items-center justify-center gap-2 group/btn"
-                    >
-                      <span className="group-hover/btn:rotate-12 transition-transform">✏️</span> Edit
-                    </button>
-                    <button
-                      onClick={() => handleKill(boss)}
-                      className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white py-2 pl-2 pr-3 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg shadow-purple-900/20 hover:shadow-purple-500/30 flex items-center justify-center gap-2 group/btn"
-                    >
-                      <span className="group-hover/btn:animate-bounce">⚔️</span> Kill
-                    </button>
+                  <div className="space-y-3 mb-6 flex-grow">
+                    <div className="flex items-center gap-2 text-sm text-slate-400">
+                      <span className="text-base">📍</span>
+                      <span className="font-medium text-slate-300">{boss.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-400">
+                      <span className="text-base">⏱️</span>
+                      <span>Respawn: <span className="text-slate-300">{boss.respawnHours}h</span></span>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 mt-auto border-t border-white/5">
+                    {boss.nextSpawnAt ? (
+                      <div className="mb-4">
+                        <div className="flex justify-between items-end mb-1">
+                          <div className="text-xs text-slate-400 font-medium uppercase tracking-wide">Time Remaining</div>
+                           <div className="text-xs text-slate-400 font-mono">
+                            {new Date(boss.nextSpawnAt).toLocaleString([], {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                        </div>
+                        <LiveTimer boss={boss} />
+                      </div>
+                    ) : (
+                      <div className="mb-4 text-amber-300 font-semibold flex items-center gap-2 bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+                        <span>⏳</span> Not Scheduled
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(boss)}
+                        className="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-300 py-2 pl-2 pr-3 rounded-lg text-sm font-medium transition-all duration-200 border border-white/5 hover:border-white/20 flex items-center justify-center gap-2 group/btn"
+                      >
+                        <span className="group-hover/btn:rotate-12 transition-transform">✏️</span> Edit
+                      </button>
+                      <button
+                        onClick={() => handleKill(boss)}
+                        className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white py-2 pl-2 pr-3 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg shadow-purple-900/20 hover:shadow-purple-500/30 flex items-center justify-center gap-2 group/btn"
+                      >
+                        <span className="group-hover/btn:animate-bounce">⚔️</span> Kill
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+        )}
 
         {filteredBosses.length === 0 && (
           <div className="text-center py-20">
