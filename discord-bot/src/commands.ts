@@ -119,6 +119,88 @@ export async function handleAllBossesCommand(message: Message) {
             .setDescription(tableContent)
             .setColor(0x2B2D31); // Discord dark theme color
 
+        // Fixed Schedule Configuration
+        const scheduleData = [
+            { 
+                dayName: 'Monday', dayIndex: 1, 
+                events: [
+                    { time: '11:30', name: 'Clemantis (Lvl 70)' },
+                    { time: '19:00', name: 'Thymele (Lvl 85)' }
+                ] 
+            },
+            { 
+                dayName: 'Tuesday', dayIndex: 2, 
+                events: [
+                    { time: '11:30', name: 'Saphirus (Lvl 80)' },
+                    { time: '19:00', name: 'Neutro (Lvl 80)' }
+                ] 
+            },
+            { 
+                dayName: 'Wednesday', dayIndex: 3, 
+                events: [
+                    { time: '11:30', name: 'Thymele (Lvl 85)' },
+                    { time: '21:00', name: 'Auraq (Lvl 100)' }
+                ] 
+            },
+            { 
+                dayName: 'Thursday', dayIndex: 4, 
+                events: [
+                    { time: '11:30', name: 'Neutro (Lvl 80)' },
+                    { time: '19:00', name: 'Clemantis (Lvl 70)' }
+                ] 
+            },
+            { 
+                dayName: 'Friday', dayIndex: 5, 
+                events: [
+                    { time: '19:00', name: 'Roderick (Lvl 95)' },
+                    { time: '22:00', name: 'Auraq (Lvl 100)' }
+                ] 
+            },
+            { 
+                dayName: 'Saturday', dayIndex: 6, 
+                events: [
+                    { time: '15:00', name: 'Milavy (Lvl 90)' },
+                    { time: '17:00', name: 'Ringor (Lvl 95)' },
+                    { time: '22:00', name: 'Chaiflock (Lvl 120)' }
+                ] 
+            },
+            { 
+                dayName: 'Sunday', dayIndex: 0, 
+                events: [
+                    { time: '17:00', name: 'Saphirus (Lvl 80)' },
+                    { time: '21:00', name: 'Benji (Lvl 120)' }
+                ] 
+            }
+        ];
+
+        // Generate dynamic schedule text
+        const fixedScheduleText = scheduleData.map(day => {
+            const eventLines = day.events.map(ev => {
+                const now = new Date();
+                const [h, m] = ev.time.split(':').map(Number);
+                
+                // Construct target date (UTC)
+                const target = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), h, m, 0));
+                
+                const currentDay = now.getUTCDay();
+                let daysDiff = (day.dayIndex - currentDay + 7) % 7;
+
+                // Adjust for past times today
+                if (daysDiff === 0 && target.getTime() < now.getTime()) {
+                    daysDiff = 7;
+                }
+                
+                target.setUTCDate(target.getUTCDate() + daysDiff);
+                const unix = Math.floor(target.getTime() / 1000);
+
+                return `${ev.time} — ${ev.name} (<t:${unix}:R>)`;
+            }).join('\n');
+
+            return `**${day.dayName}**\n${eventLines}`;
+        }).join('\n\n');
+
+        embed.addFields({ name: '📅 Fixed Event Schedule', value: fixedScheduleText });
+
         await message.reply({ embeds: [embed] });
     }
 
