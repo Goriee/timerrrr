@@ -485,6 +485,17 @@ export default function BossListClient() {
                    {/* Card Gradient */}
                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 via-yellow-500/0 to-orange-500/0 group-hover:via-yellow-500/5 transition-all duration-500" />
                    
+                   {/* Boss Image Background */}
+                   <div className="absolute inset-0 z-0">
+                      <img 
+                        src={`/bosses/${boss.name.toLowerCase()}.png`}
+                        alt={boss.name}
+                        className="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity duration-500 grayscale group-hover:grayscale-0"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-slate-900/30" />
+                   </div>
+
                    <div className="p-5 relative z-10 h-full flex flex-col">
                       <div className="flex justify-between items-start mb-4">
                         <h3 className="text-xl font-bold text-slate-100 group-hover:text-yellow-200 transition-colors">{boss.name}</h3>
@@ -530,6 +541,17 @@ export default function BossListClient() {
               >
                 {/* Card Gradient Border Effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-purple-500/0 to-blue-500/0 group-hover:via-purple-500/10 transition-all duration-500" />
+
+                {/* Boss Image Background */}
+                <div className="absolute inset-0 z-0">
+                  <img 
+                    src={`/bosses/${boss.name.toLowerCase()}.png`}
+                    alt={boss.name}
+                    className="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity duration-500 grayscale group-hover:grayscale-0"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-slate-900/30" />
+                </div>
 
                 <div className="p-5 relative z-10 h-full flex flex-col">
                   <div className="flex justify-between items-start mb-4">
