@@ -379,7 +379,7 @@ export default function BossListClient() {
                   <h2 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-blue-200 drop-shadow-2xl">
                     {nearestBoss.name}
                   </h2>
-                  <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-black/50 rotate-3 group-hover:rotate-0 transition-all duration-500">
+                  <div className="w-48 h-48 md:w-64 md:h-64 shrink-0 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-black/50 transition-all duration-500">
                       <img 
                         src={`/bosses/${nearestBoss.name.toLowerCase()}.png`}
                         alt={nearestBoss.name}
