@@ -371,13 +371,12 @@ export default function BossListClient() {
             <div className="relative z-10 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-center md:text-left w-full md:w-auto">
                 <div className="flex flex-col items-center md:items-start">
-                  
-                  <div className="flex flex-col md:flex-row items-center gap-6 mb-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-200 text-sm font-semibold border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse shrink-0">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20"></span>
-                      <span>🚨</span> NEXT DETECTED
-                    </div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-200 text-sm font-semibold border border-red-500/30 mb-2 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20"></span>
+                    <span>🚨</span> NEXT TARGET DETECTED
+                  </div>
 
+                  <div className="flex flex-col md:flex-row items-center gap-6 mb-4">
                     <h2 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-blue-200 drop-shadow-2xl">
                       {nearestBoss.name}
                     </h2>
