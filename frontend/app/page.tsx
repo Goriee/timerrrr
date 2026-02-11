@@ -586,7 +586,7 @@ export default function BossListClient() {
 
                      <div className="flex flex-col items-end gap-3">
                          <div className="w-3 h-3 rounded-full bg-slate-700 shadow-inner group-hover:bg-purple-500/50 transition-colors" />
-                         <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-white/10 shadow-lg bg-black/40">
+                         <div className="w-36 h-36 rounded-xl overflow-hidden border-2 border-white/10 shadow-lg bg-black/40">
                              <img 
                                 src={`/bosses/${boss.name.toLowerCase()}.png`}
                                 alt={boss.name}
