@@ -368,18 +368,18 @@ export default function BossListClient() {
             <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-blue-900/20 backdrop-blur-sm" />
             <div className="absolute -right-20 -top-20 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" />
             
-            <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="relative z-10 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-200 text-sm font-semibold border border-red-500/30 mb-6 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-200 text-sm font-semibold border border-red-500/30 mb-4 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20"></span>
                   <span>🚨</span> NEXT TARGET DETECTED
                 </div>
                 
-                <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
-                  <h2 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-blue-200 drop-shadow-2xl">
+                <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
+                  <h2 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-blue-200 drop-shadow-2xl">
                     {nearestBoss.name}
                   </h2>
-                  <div className="w-48 h-48 md:w-64 md:h-64 shrink-0 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-black/50 transition-all duration-500">
+                  <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-black/50 transition-all duration-500">
                       <img 
                         src={`/bosses/${nearestBoss.name.toLowerCase()}.png`}
                         alt={nearestBoss.name}
@@ -389,14 +389,14 @@ export default function BossListClient() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap justify-center md:justify-start gap-4 text-lg text-slate-300 font-medium">
-                  <span className="flex items-center gap-2 bg-slate-800/60 px-5 py-2.5 rounded-xl border border-white/5 shadow-lg backdrop-blur-md">
+                <div className="flex flex-wrap justify-center md:justify-start gap-3 text-base text-slate-300 font-medium">
+                  <span className="flex items-center gap-2 bg-slate-800/60 px-4 py-2 rounded-xl border border-white/5 shadow-lg backdrop-blur-md">
                     <span className="text-blue-400">📍</span> {nearestBoss.location}
                   </span>
-                  <span className="flex items-center gap-2 bg-slate-800/60 px-5 py-2.5 rounded-xl border border-white/5 shadow-lg backdrop-blur-md">
+                  <span className="flex items-center gap-2 bg-slate-800/60 px-4 py-2 rounded-xl border border-white/5 shadow-lg backdrop-blur-md">
                     <span className="text-purple-400">⚔️</span> Lv {nearestBoss.level}
                   </span>
-                  <span className={`flex items-center gap-2 bg-slate-800/60 px-5 py-2.5 rounded-xl border border-white/5 shadow-lg backdrop-blur-md`}>
+                  <span className={`flex items-center gap-2 bg-slate-800/60 px-4 py-2 rounded-xl border border-white/5 shadow-lg backdrop-blur-md`}>
                      {nearestBoss.attackType === 'melee' ? '🛡️' : '✨'} {nearestBoss.attackType}
                   </span>
                 </div>
