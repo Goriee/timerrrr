@@ -365,29 +365,30 @@ export default function BossListClient() {
         {nearestBoss && (
           <div className="mb-12 relative overflow-hidden rounded-3xl bg-slate-900 border border-purple-500/30 shadow-2xl shadow-purple-900/40 group hover:border-purple-500/50 transition-colors duration-500">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-blue-900/20 backdrop-blur-sm" />
-            <div className="absolute -right-20 -top-20 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute inset-0 z-0">
+               <img 
+                 src={`/bosses/${nearestBoss.name.toLowerCase()}.png`}
+                 alt={nearestBoss.name}
+                 className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity duration-500 blur-sm"
+                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+               />
+               <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/90 to-blue-900/40 backdrop-blur-[2px]" />
+            </div>
+            
+            <div className="absolute -right-20 -top-20 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse pointer-events-none" />
 
-            <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-200 text-sm font-semibold border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse">
+            <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-200 text-sm font-semibold border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse z-20">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20"></span>
               <span>🚨</span> NEXT TARGET DETECTED
             </div>
             
             <div className="relative z-10 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-center md:text-left w-full md:w-auto">
-                <div className="flex flex-col items-center md:items-start">
+                <div className="flex flex-col items-center md:items-start pt-8">
                   <div className="flex flex-col md:flex-row items-center gap-6 mb-4">
                     <h2 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-blue-200 drop-shadow-2xl">
                       {nearestBoss.name}
                     </h2>
-                    <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-black/50 transition-all duration-500">
-                        <img 
-                          src={`/bosses/${nearestBoss.name.toLowerCase()}.png`}
-                          alt={nearestBoss.name}
-                          className="w-full h-full object-cover transform scale-110 hover:scale-100 transition-transform duration-700"
-                          onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
-                        />
-                    </div>
                   </div>
 
                   <div className="flex flex-wrap justify-center md:justify-start gap-3 text-base text-slate-300 font-medium">
