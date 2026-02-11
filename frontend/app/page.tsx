@@ -554,35 +554,47 @@ export default function BossListClient() {
                 </div>
 
                 <div className="p-5 relative z-10 h-full flex flex-col">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-slate-100 mb-1 group-hover:text-purple-200 transition-colors">{boss.name}</h3>
-                      <div className="flex gap-2 text-xs font-semibold">
-                        <span className={`px-2 py-1 rounded-md border ${
-                          boss.attackType === 'melee' 
-                            ? 'bg-orange-500/10 text-orange-200 border-orange-500/20' 
-                            : 'bg-blue-500/10 text-blue-200 border-blue-500/20'
-                        }`}>
-                          {boss.attackType === 'melee' ? '⚔️' : '✨'} {boss.attackType}
-                        </span>
-                        <span className="px-2 py-1 bg-slate-700/50 text-slate-300 rounded-md border border-slate-600/50">
-                          Lv {boss.level}
-                        </span>
-                      </div>
-                    </div>
-                    {/* Status Indicator Dot */}
-                    <div className="w-3 h-3 rounded-full bg-slate-700 shadow-inner group-hover:bg-purple-500/50 transition-colors" />
-                  </div>
+                  {/* Top Section: Info & Thumbnail */}
+                  <div className="flex justify-between gap-4 mb-6 flex-grow">
+                     <div className="flex-1 min-w-0"> {/* min-w-0 needed for text truncation to work in flex child */}
+                        <h3 className="text-xl font-bold text-slate-100 mb-2 group-hover:text-purple-200 transition-colors truncate">{boss.name}</h3>
+                        
+                        <div className="flex gap-2 text-xs font-semibold mb-4">
+                          <span className={`px-2 py-1 rounded-md border ${
+                            boss.attackType === 'melee' 
+                              ? 'bg-orange-500/10 text-orange-200 border-orange-500/20' 
+                              : 'bg-blue-500/10 text-blue-200 border-blue-500/20'
+                          }`}>
+                            {boss.attackType === 'melee' ? '⚔️' : '✨'} {boss.attackType}
+                          </span>
+                          <span className="px-2 py-1 bg-slate-700/50 text-slate-300 rounded-md border border-slate-600/50">
+                            Lv {boss.level}
+                          </span>
+                        </div>
 
-                  <div className="space-y-3 mb-6 flex-grow">
-                    <div className="flex items-center gap-2 text-sm text-slate-400">
-                      <span className="text-base">📍</span>
-                      <span className="font-medium text-slate-300">{boss.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-400">
-                      <span className="text-base">⏱️</span>
-                      <span>Respawn: <span className="text-slate-300">{boss.respawnHours}h</span></span>
-                    </div>
+                        <div className="space-y-2">
+                          <div className="flex items-start gap-2 text-sm text-slate-400">
+                            <span className="text-base mt-0.5">📍</span>
+                            <span className="font-medium text-slate-300 leading-snug break-words">{boss.location}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-slate-400">
+                            <span className="text-base">⏱️</span>
+                            <span>Respawn: <span className="text-slate-300">{boss.respawnHours}h</span></span>
+                          </div>
+                        </div>
+                     </div>
+
+                     <div className="flex flex-col items-end gap-3">
+                         <div className="w-3 h-3 rounded-full bg-slate-700 shadow-inner group-hover:bg-purple-500/50 transition-colors" />
+                         <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-white/10 shadow-lg bg-black/40">
+                             <img 
+                                src={`/bosses/${boss.name.toLowerCase()}.png`}
+                                alt={boss.name}
+                                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                                onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
+                              />
+                         </div>
+                     </div>
                   </div>
                   
                   <div className="pt-4 mt-auto border-t border-white/5">
