@@ -389,6 +389,19 @@ export default function BossListClient() {
                   </span>
                 </div>
               </div>
+              
+              {/* Hero Boss Image */}
+              <div className="relative group/hero-img shrink-0">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full opacity-20 blur-2xl group-hover/hero-img:opacity-40 transition-opacity duration-500" />
+                  <div className="w-56 h-56 md:w-72 md:h-72 rounded-2xl overflow-hidden border-4 border-white/10 shadow-2xl relative z-10 bg-black/50 rotate-3 group-hover/hero-img:rotate-0 transition-all duration-500">
+                      <img 
+                        src={`/bosses/${nearestBoss.name.toLowerCase()}.png`}
+                        alt={nearestBoss.name}
+                        className="w-full h-full object-cover transform scale-110 group-hover/hero-img:scale-100 transition-transform duration-700"
+                        onError={(e) => { (e.target as HTMLImageElement).parentElement!.parentElement!.style.display = 'none'; }}
+                      />
+                  </div>
+              </div>
 
               <div className="flex flex-col items-center relative">
                  <div className="absolute inset-0 bg-purple-500/20 blur-[50px] rounded-full"></div>
