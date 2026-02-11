@@ -374,9 +374,21 @@ export default function BossListClient() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20"></span>
                   <span>🚨</span> NEXT TARGET DETECTED
                 </div>
-                <h2 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-blue-200 mb-6 drop-shadow-2xl">
-                  {nearestBoss.name}
-                </h2>
+                
+                <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
+                  <h2 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-blue-200 drop-shadow-2xl">
+                    {nearestBoss.name}
+                  </h2>
+                  <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-black/50 rotate-3 group-hover:rotate-0 transition-all duration-500">
+                      <img 
+                        src={`/bosses/${nearestBoss.name.toLowerCase()}.png`}
+                        alt={nearestBoss.name}
+                        className="w-full h-full object-cover transform scale-110 hover:scale-100 transition-transform duration-700"
+                        onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
+                      />
+                  </div>
+                </div>
+
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-lg text-slate-300 font-medium">
                   <span className="flex items-center gap-2 bg-slate-800/60 px-5 py-2.5 rounded-xl border border-white/5 shadow-lg backdrop-blur-md">
                     <span className="text-blue-400">📍</span> {nearestBoss.location}
@@ -388,19 +400,6 @@ export default function BossListClient() {
                      {nearestBoss.attackType === 'melee' ? '🛡️' : '✨'} {nearestBoss.attackType}
                   </span>
                 </div>
-              </div>
-              
-              {/* Hero Boss Image */}
-              <div className="relative group/hero-img shrink-0">
-                  <div className="absolute -inset-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full opacity-20 blur-2xl group-hover/hero-img:opacity-40 transition-opacity duration-500" />
-                  <div className="w-56 h-56 md:w-72 md:h-72 rounded-2xl overflow-hidden border-4 border-white/10 shadow-2xl relative z-10 bg-black/50 rotate-3 group-hover/hero-img:rotate-0 transition-all duration-500">
-                      <img 
-                        src={`/bosses/${nearestBoss.name.toLowerCase()}.png`}
-                        alt={nearestBoss.name}
-                        className="w-full h-full object-cover transform scale-110 group-hover/hero-img:scale-100 transition-transform duration-700"
-                        onError={(e) => { (e.target as HTMLImageElement).parentElement!.parentElement!.style.display = 'none'; }}
-                      />
-                  </div>
               </div>
 
               <div className="flex flex-col items-center relative">
