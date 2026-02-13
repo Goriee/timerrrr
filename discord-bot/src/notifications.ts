@@ -16,8 +16,11 @@ interface Boss extends RowDataPacket {
 
 export function startNotificationScanner(client: Client) {
   // Check every 60 seconds
-  setInterval(() => checkBosses(client), 60 * 1000);
+  const interval = setInterval(() => checkBosses(client), 60 * 1000);
   console.log('⏰ Notification scanner started (60s interval).');
+  
+  // Run an immediate check on startup
+  checkBosses(client);
 }
 
 async function checkBosses(client: Client) {
@@ -27,51 +30,62 @@ async function checkBosses(client: Client) {
       "SELECT setting_value FROM bot_settings WHERE setting_key = 'notification_channel'"
     );
 
-    if (settings.length === 0) return; // No channel set
+    if (settings.length === 0) {
+        console.log('No notification channel set in DB.'); 
+        return; 
+    }
     const channelId = settings[0].setting_value;
 
     const channel = await client.channels.fetch(channelId).catch(() => null);
-    if (!channel || !(channel instanceof TextChannel)) {
-      console.warn(`⚠️ Notification channel ${channelId} not found or not text.`);
+    
+    // Check if channel exists and is a type that can convert to TextChannel/NewsChannel/ThreadChannel
+    // Using simple type assertion to TextChannel for simplicity as we filtered for text-based content
+    // but explicit check is better
+    if (!channel || (!channel.isTextBased())) {
+      console.warn(`⚠️ Notification channel ${channelId} not found or not text-based.`);
       return;
     }
 
-    // Get bosses spawning in roughly 10 minutes (9.5 - 10.5 minute window)
-    // Using a tight 1-minute window to avoid duplicate alerts on the next scan
+    // Cast to TextChannel or similar interface that has .send
+    // In discord.js v14, isTextBased() includes TextChannel, DMChannel, NewsChannel, ThreadChannel, VoiceChannel
+    const textChannel = channel as TextChannel;
+
     const [bosses] = await pool.query<RowDataPacket[]>(`
       SELECT * FROM bosses 
-      WHERE next_spawn_at BETWEEN DATE_ADD(NOW(), INTERVAL 9 MINUTE 30 SECOND) 
-                              AND DATE_ADD(NOW(), INTERVAL 10 MINUTE 30 SECOND)
+      WHERE next_spawn_at BETWEEN DATE_ADD(NOW(), INTERVAL 9 MINUTE) 
+                              AND DATE_ADD(NOW(), INTERVAL 11 MINUTE)
     `);
 
     if (bosses.length === 0) return;
 
     for (const boss of bosses) {
+      console.log(`Found boss: ${boss.name} spawning at ${boss.next_spawn_at}`);
+
       // Build notification
       const spawnTime = new Date(boss.next_spawn_at);
       const unixTime = Math.floor(spawnTime.getTime() / 1000);
       
-      const imagePath = `../frontend/public/bosses/${boss.name.toLowerCase()}.png`;
-      const attachmentName = `${boss.name.toLowerCase()}.png`;
-
+      // Fix path: currently assumes ../frontend/public from dist/src/notifications.js which is wrong
+      // dist is usually parallel to frontend if built at root or inside discord-bot
+      // process.cwd() is usually /app or project root.
+      // let's try a safer image resolution or just use a placeholder if missing
+      
       const embed = new EmbedBuilder()
         .setTitle(`${boss.name} spawning in ~10 minutes!`)
         .setDescription('Get ready for the boss spawn!')
         .setColor(0xE67E22) // Orange-ish like the screenshot
-        .setThumbnail(`attachment://${attachmentName}`)
         .addFields(
           { name: 'Level', value: String(boss.level || '??'), inline: true },
           { name: 'Location', value: boss.location || 'Unknown', inline: true },
           { name: 'Attack Type', value: boss.attack_type || 'Unknown', inline: true },
-          // Removed Continent as column may not exist
           { name: 'Spawns At', value: `<t:${unixTime}:T> (<t:${unixTime}:R>)`, inline: false }
         );
 
-      await channel.send({ 
-        embeds: [embed],
-        files: [{ attachment: imagePath, name: attachmentName }]
+      await textChannel.send({ 
+        embeds: [embed]
+        // Removed local file attachment for now to prevent crashes if file path is wrong on Render
       });
-      console.log(`📢 Sent notification for ${boss.name} to ${channel.name}`);
+      console.log(`📢 Sent notification for ${boss.name} to ${textChannel.id}`);
     }
 
   } catch (error) {
