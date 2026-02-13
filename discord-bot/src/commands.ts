@@ -1,6 +1,32 @@
-import { Message, EmbedBuilder } from 'discord.js';
+import { Message, EmbedBuilder, PermissionsBitField } from 'discord.js';
 import pool from './db';
 import { RowDataPacket } from 'mysql2/promise';
+
+export async function handleSetChannelCommand(message: Message) {
+  if (!message.member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
+    message.reply('❌ You do not have permission to use this command.');
+    return;
+  }
+
+  const channel = message.mentions.channels.first();
+  if (!channel) {
+    message.reply('Please mention a channel. Usage: `!setchannel #channel-name`');
+    return;
+  }
+
+  try {
+    // Save channel ID to bot_settings
+    await pool.query(
+      'INSERT INTO bot_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?',
+      ['notification_channel', channel.id, channel.id]
+    );
+
+    message.reply(`✅ Notification channel set to ${channel}. I will send boss alerts there!`);
+  } catch (error) {
+    console.error(error);
+    message.reply('❌ Failed to update settings.');
+  }
+}
 
 export async function handleKillCommand(message: Message, args: string[]) {
   const bossNameSearch = args.join(' ');
