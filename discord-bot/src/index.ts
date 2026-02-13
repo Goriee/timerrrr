@@ -39,4 +39,13 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-client.login(process.env.BOT_TOKEN);
+// Try to get token from multiple environment variables
+const token = process.env.DISCORD_BOT_TOKEN || process.env.BOT_TOKEN || process.env.DISCORD_TOKEN;
+
+if (!token) {
+  console.error('Error: Discord bot token not found!');
+  console.error('Please set DISCORD_BOT_TOKEN (or BOT_TOKEN) in your environment variables or .env file.');
+  process.exit(1);
+}
+
+client.login(token);
