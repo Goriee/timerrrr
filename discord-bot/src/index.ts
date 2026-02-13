@@ -43,11 +43,12 @@ client.on('messageCreate', async (message) => {
   const args = message.content.trim().split(/ +/);
   const command = args.shift()?.toLowerCase();
 
-  if (command === 'kill') {
+  // Support both prefix (!) and no prefix commands
+  if (command === 'kill' || command === '!kill') {
     await handleKillCommand(message, args);
-  } else if (command === 'bosslist') {
+  } else if (command === 'bosslist' || command === '!bosslist') {
     await handleAllBossesCommand(message);
-  } else if (command === 'setchannel') {
+  } else if (command === 'setchannel' || command === '!setchannel') {
     await handleSetChannelCommand(message);
   }
 });
