@@ -50,10 +50,15 @@ async function checkBosses(client: Client) {
     // In discord.js v14, isTextBased() includes TextChannel, DMChannel, NewsChannel, ThreadChannel, VoiceChannel
     const textChannel = channel as TextChannel;
 
+    // Get bosses spawning in exactly 10 minutes provided the check runs every minute
+    // We use a narrow window (e.g. 9.5 to 10.5 minutes) to avoid double notifications
+    // If the scanner runs at T+0 (boss in 10m), it catches it.
+    // If it runs at T+1 (boss in 9m), it should NOT catch it.
+    // Window: 9m 30s to 10m 30s
     const [bosses] = await pool.query<RowDataPacket[]>(`
       SELECT * FROM bosses 
-      WHERE next_spawn_at BETWEEN DATE_ADD(NOW(), INTERVAL 9 MINUTE) 
-                              AND DATE_ADD(NOW(), INTERVAL 11 MINUTE)
+      WHERE next_spawn_at BETWEEN DATE_ADD(NOW(), INTERVAL 9 MINUTE 30 SECOND) 
+                              AND DATE_ADD(NOW(), INTERVAL 10 MINUTE 30 SECOND)
     `);
 
     if (bosses.length === 0) return;
@@ -65,15 +70,15 @@ async function checkBosses(client: Client) {
       const spawnTime = new Date(boss.next_spawn_at);
       const unixTime = Math.floor(spawnTime.getTime() / 1000);
       
-      // Fix path: currently assumes ../frontend/public from dist/src/notifications.js which is wrong
-      // dist is usually parallel to frontend if built at root or inside discord-bot
-      // process.cwd() is usually /app or project root.
-      // let's try a safer image resolution or just use a placeholder if missing
-      
+      // Use GitHub raw content for reliable image hosting without file system issues
+      // Assuming 'master' branch. Adjust if main/etc.
+      const imageUrl = `https://raw.githubusercontent.com/Goriee/timerrrr/master/frontend/public/bosses/${boss.name.toLowerCase()}.png`;
+
       const embed = new EmbedBuilder()
         .setTitle(`⚔️ **${boss.name}** Spawning Soon!`)
         .setDescription(`**${boss.name}** will spawn in approximately **10 minutes**!`)
-        .setColor(0xE67E22) // Orange-ish like the screenshot
+        .setColor(0x00A2E8) // Blue
+        .setThumbnail(imageUrl)
         .addFields(
           { name: 'Level', value: String(boss.level || '??'), inline: true },
           { name: 'Location', value: boss.location || 'Unknown', inline: true },
@@ -84,7 +89,6 @@ async function checkBosses(client: Client) {
 
       await textChannel.send({ 
         embeds: [embed]
-        // Removed local file attachment for now to prevent crashes if file path is wrong on Render
       });
       console.log(`📢 Sent notification for ${boss.name} to ${textChannel.id}`);
     }
