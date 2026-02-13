@@ -50,15 +50,15 @@ async function checkBosses(client: Client) {
     // In discord.js v14, isTextBased() includes TextChannel, DMChannel, NewsChannel, ThreadChannel, VoiceChannel
     const textChannel = channel as TextChannel;
 
-    // Get bosses spawning in exactly 10 minutes provided the check runs every minute
-    // We use a narrow window (e.g. 9.5 to 10.5 minutes) to avoid double notifications
-    // If the scanner runs at T+0 (boss in 10m), it catches it.
-    // If it runs at T+1 (boss in 9m), it should NOT catch it.
-    // Window: 9m 30s to 10m 30s
+    // Get bosses spawning in exactly 10 minutes
+    // MySQL 5.7+ syntax: INTERVAL '9:30' MINUTE_SECOND
+    // Or just use pure seconds for safety across versions
+    // 9m 30s = 570 seconds
+    // 10m 30s = 630 seconds
     const [bosses] = await pool.query<RowDataPacket[]>(`
       SELECT * FROM bosses 
-      WHERE next_spawn_at BETWEEN DATE_ADD(NOW(), INTERVAL 9 MINUTE 30 SECOND) 
-                              AND DATE_ADD(NOW(), INTERVAL 10 MINUTE 30 SECOND)
+      WHERE next_spawn_at BETWEEN DATE_ADD(NOW(), INTERVAL 570 SECOND) 
+                              AND DATE_ADD(NOW(), INTERVAL 630 SECOND)
     `);
 
     if (bosses.length === 0) return;
