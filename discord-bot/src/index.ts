@@ -1,9 +1,22 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
+import express from 'express';
 import { handleKillCommand, handleAllBossesCommand, handleSetChannelCommand } from './commands';
 import { startNotificationScanner } from './notifications';
 
 dotenv.config();
+
+// Create a simple Express server for health checks (required for some hosting platforms like Render)
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.send('Discord Bot is running!');
+});
+
+app.listen(port, () => {
+  console.log(`Health check server listening on port ${port}`);
+});
 
 const client = new Client({
   intents: [
