@@ -71,15 +71,16 @@ async function checkBosses(client: Client) {
       // let's try a safer image resolution or just use a placeholder if missing
       
       const embed = new EmbedBuilder()
-        .setTitle(`${boss.name} spawning in ~10 minutes!`)
-        .setDescription('Get ready for the boss spawn!')
+        .setTitle(`⚔️ **${boss.name}** Spawning Soon!`)
+        .setDescription(`**${boss.name}** will spawn in approximately **10 minutes**!`)
         .setColor(0xE67E22) // Orange-ish like the screenshot
         .addFields(
           { name: 'Level', value: String(boss.level || '??'), inline: true },
           { name: 'Location', value: boss.location || 'Unknown', inline: true },
           { name: 'Attack Type', value: boss.attack_type || 'Unknown', inline: true },
-          { name: 'Spawns At', value: `<t:${unixTime}:T> (<t:${unixTime}:R>)`, inline: false }
-        );
+          { name: 'Spawn Time', value: `<t:${unixTime}:T> (<t:${unixTime}:R>)`, inline: false }
+        )
+        .setTimestamp();
 
       await textChannel.send({ 
         embeds: [embed]
