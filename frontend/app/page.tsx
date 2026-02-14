@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { Boss } from '@/types';
 import { bossApi } from '@/lib/api';
@@ -67,6 +67,7 @@ export default function BossListClient() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const hasLoadedOnce = useRef(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -135,10 +136,16 @@ export default function BossListClient() {
   // Initial load effect
   useEffect(() => {
     if (isAuthenticated) {
-      setLoading(true);
+      // Only show spinner on the very first load
+      if (!hasLoadedOnce.current) {
+        setLoading(true);
+      }
       fetchBosses()
         .catch(() => setError('Failed to load bosses'))
-        .finally(() => setLoading(false));
+        .finally(() => {
+          setLoading(false);
+          hasLoadedOnce.current = true;
+        });
     }
   }, [selectedServer, isAuthenticated]); // Re-run only when server changes or auth
 
