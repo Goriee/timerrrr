@@ -89,9 +89,9 @@ export default function BossListClient() {
     }
   }, []);
 
-  const fetchBosses = useCallback(async () => {
+  const fetchBosses = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const data = await bossApi.getAllBosses(selectedServer);
       
       // Separate Dynamic (DB) from Fixed
@@ -124,17 +124,17 @@ export default function BossListClient() {
       });
 
       setFixedBosses(generatedFixed);
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     } catch (err) {
       setError('Failed to load bosses');
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   }, [selectedServer]);
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchBosses();
-      const interval = setInterval(fetchBosses, 30000);
+      const interval = setInterval(() => fetchBosses(true), 30000);
       return () => clearInterval(interval);
     }
   }, [fetchBosses, isAuthenticated]);
