@@ -89,11 +89,7 @@ export default function BossListClient() {
     }
   }, []);
 
-  const fetchBosses = useCallback(async (isBackground = false) => {
-    try {
-      if (!isBackground) setLoading(true);
-      const data = await bossApi.getAllBosses(selectedServer);
-      
+  const processBossData = (data: Boss[]) => {
       // Separate Dynamic (DB) from Fixed
       const dynamic = data.filter(b => !isFixedBoss(b.name));
       setBosses(dynamic);
@@ -124,17 +120,32 @@ export default function BossListClient() {
       });
 
       setFixedBosses(generatedFixed);
-      if (!isBackground) setLoading(false);
+  };
+
+  const fetchBosses = useCallback(async () => {
+    try {
+      const data = await bossApi.getAllBosses(selectedServer);
+      processBossData(data);
     } catch (err) {
-      setError('Failed to load bosses');
-      if (!isBackground) setLoading(false);
+      console.error(err);
+      // Don't set global error on background refresh failure to avoid blocking UI
     }
   }, [selectedServer]);
 
+  // Initial load effect
   useEffect(() => {
     if (isAuthenticated) {
-      fetchBosses();
-      const interval = setInterval(() => fetchBosses(true), 30000);
+      setLoading(true);
+      fetchBosses()
+        .catch(() => setError('Failed to load bosses'))
+        .finally(() => setLoading(false));
+    }
+  }, [selectedServer, isAuthenticated]); // Re-run only when server changes or auth
+
+  // Background refresh effect
+  useEffect(() => {
+    if (isAuthenticated) {
+      const interval = setInterval(fetchBosses, 30000);
       return () => clearInterval(interval);
     }
   }, [fetchBosses, isAuthenticated]);
