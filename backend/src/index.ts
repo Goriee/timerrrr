@@ -48,11 +48,15 @@ app.get('/health', (req, res) => {
 app.get('/api/bosses', async (req: Request, res: Response) => {
   try {
     const server = req.query.server as string || 'M5'; // Default to M5
+    console.log(`Fetching bosses for server: ${server}`); // Debug logging
 
     const [rows] = await pool.query<RowDataPacket[]>(
       'SELECT * FROM bosses WHERE server = ? ORDER BY CASE WHEN next_spawn_at IS NULL THEN 1 ELSE 0 END, next_spawn_at ASC, name ASC',
       [server]
     );
+
+    console.log(`Found ${rows.length} bosses for server ${server}`);
+
     
     const bosses: Boss[] = rows.map(row => ({
       id: row.id,
