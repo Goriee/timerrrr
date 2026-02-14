@@ -77,7 +77,7 @@ async function checkBosses(client: Client) {
       const imageUrl = `https://raw.githubusercontent.com/Goriee/timerrrr/master/frontend/public/bosses/${boss.name.toLowerCase()}.png`;
 
       const embed = new EmbedBuilder()
-        .setTitle(`⚔️ **${boss.name}** Spawning Soon!`)
+        .setTitle(`⚔️ **${boss.name}** (M1) Spawning Soon!`)
         .setDescription(`**${boss.name}** will spawn in approximately **10 minutes**!`)
         .setColor(0x00A2E8) // Blue
         .setThumbnail(imageUrl)
