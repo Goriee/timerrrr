@@ -49,37 +49,15 @@ async function migrate() {
     `, [passwordHash, passwordHash]);
     console.log('✓ Admin password set (naiwan)');
 
-    // Insert sample bosses
+    const sampleBosses: any[] = [];
+    /* Sample bosses removed 
     const sampleBosses = [
       {
         name: 'Dragon Lord',
-        attackType: 'magic',
-        level: 80,
-        respawnHours: 24,
-        location: 'Dragon Peak'
-      },
-      {
-        name: 'Shadow Knight',
-        attackType: 'melee',
-        level: 75,
-        respawnHours: 12,
-        location: 'Dark Castle'
-      },
-      {
-        name: 'Ice Queen',
-        attackType: 'magic',
-        level: 85,
-        respawnHours: 48,
-        location: 'Frozen Throne'
-      },
-      {
-        name: 'Thunder Beast',
-        attackType: 'melee',
-        level: 70,
-        respawnHours: 6,
-        location: 'Storm Valley'
-      }
+        
+    ... 
     ];
+    */
 
     for (const boss of sampleBosses) {
       await connection.query(`
