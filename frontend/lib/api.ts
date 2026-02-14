@@ -12,8 +12,8 @@ const api = axios.create({
 
 export const bossApi = {
   // Get all bosses
-  getAllBosses: async (): Promise<Boss[]> => {
-    const response = await api.get<Boss[]>('/api/bosses');
+  getAllBosses: async (server: string = 'M5'): Promise<Boss[]> => {
+    const response = await api.get<Boss[]>('/api/bosses', { params: { server } });
     return response.data;
   },
 

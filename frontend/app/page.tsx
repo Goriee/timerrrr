@@ -63,6 +63,7 @@ export default function BossListClient() {
   const [fixedBosses, setFixedBosses] = useState<Boss[]>([]);
   const [filteredBosses, setFilteredBosses] = useState<Boss[]>([]);
   const [activeTab, setActiveTab] = useState<'field' | 'fixed'>('field');
+  const [selectedServer, setSelectedServer] = useState<'M5' | 'M1'>('M5');
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -90,7 +91,8 @@ export default function BossListClient() {
 
   const fetchBosses = useCallback(async () => {
     try {
-      const data = await bossApi.getAllBosses();
+      setLoading(true);
+      const data = await bossApi.getAllBosses(selectedServer);
       
       // Separate Dynamic (DB) from Fixed
       const dynamic = data.filter(b => !isFixedBoss(b.name));
@@ -103,6 +105,7 @@ export default function BossListClient() {
           return {
               id: existing ? existing.id : -9000 - idx, // Negative IDs for local
               name: name,
+              server: selectedServer,
               level: existing ? existing.level : 0,
               location: existing ? existing.location : 'Fixed Event',
               attackType: existing ? existing.attackType : 'melee',
@@ -126,7 +129,7 @@ export default function BossListClient() {
       setError('Failed to load bosses');
       setLoading(false);
     }
-  }, []);
+  }, [selectedServer]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -317,6 +320,29 @@ export default function BossListClient() {
                 <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-purple-200">
                   Guild Boss Timer
                 </h1>
+              </div>
+              
+              <div className="flex bg-slate-800 rounded-lg p-1 border border-white/5 ml-4">
+                <button
+                  onClick={() => setSelectedServer('M5')}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${
+                    selectedServer === 'M5' 
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md' 
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  M5
+                </button>
+                <button
+                  onClick={() => setSelectedServer('M1')}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${
+                    selectedServer === 'M1' 
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md' 
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  M1
+                </button>
               </div>
             </div>
             <div className="flex gap-3">
