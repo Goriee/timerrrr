@@ -47,13 +47,17 @@ app.get('/health', (req, res) => {
 // Get all bosses
 app.get('/api/bosses', async (req: Request, res: Response) => {
   try {
+    const server = req.query.server as string || 'M5'; // Default to M5
+
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM bosses ORDER BY CASE WHEN next_spawn_at IS NULL THEN 1 ELSE 0 END, next_spawn_at ASC, name ASC'
+      'SELECT * FROM bosses WHERE server = ? ORDER BY CASE WHEN next_spawn_at IS NULL THEN 1 ELSE 0 END, next_spawn_at ASC, name ASC',
+      [server]
     );
     
     const bosses: Boss[] = rows.map(row => ({
       id: row.id,
       name: row.name,
+      server: row.server,
       attackType: row.attack_type,
       level: row.level,
       respawnHours: row.respawn_hours,
@@ -87,6 +91,7 @@ app.get('/api/bosses/:id', async (req: Request, res: Response) => {
     const boss: Boss = {
       id: row.id,
       name: row.name,
+      server: row.server,
       attackType: row.attack_type,
       level: row.level,
       respawnHours: row.respawn_hours,
@@ -210,6 +215,7 @@ app.post('/api/bosses/:id/update', async (req: Request, res: Response) => {
     const boss: Boss = {
       id: row.id,
       name: row.name,
+      server: row.server,
       attackType: row.attack_type,
       level: row.level,
       respawnHours: row.respawn_hours,
@@ -287,6 +293,7 @@ app.post('/api/bosses/:id/kill', async (req: Request, res: Response) => {
     const updatedBoss: Boss = {
       id: row.id,
       name: row.name,
+      server: row.server,
       attackType: row.attack_type,
       level: row.level,
       respawnHours: row.respawn_hours,

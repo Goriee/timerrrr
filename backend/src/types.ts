@@ -1,6 +1,7 @@
 export interface Boss {
   id: number;
   name: string;
+  server: string;
   attackType: 'melee' | 'magic';
   level: number;
   respawnHours: number;
