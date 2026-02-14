@@ -331,7 +331,7 @@ export default function BossListClient() {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  M5
+                  M1
                 </button>
                 <button
                   onClick={() => setSelectedServer('M1')}
@@ -341,7 +341,7 @@ export default function BossListClient() {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  M1
+                  M5
                 </button>
               </div>
             </div>
