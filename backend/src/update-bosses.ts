@@ -63,40 +63,40 @@ async function updateBosses() {
     for (const boss of bosses) {
       // 1. Ensure M5 boss exists
       const [rowsM5] = await connection.query<any[]>(
-        'SELECT id FROM bosses WHERE name = ? AND server = "M5"', 
+        "SELECT id FROM bosses WHERE name = ? AND server = 'M5'", 
         [boss.name]
       );
       
       if (rowsM5.length === 0) {
         await connection.query(
           `INSERT INTO bosses (name, server, attack_type, level, respawn_hours, location, created_at) 
-           VALUES (?, "M5", ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+           VALUES (?, 'M5', ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
           [boss.name, boss.attackType, boss.level, boss.respawnHours, boss.location]
         );
         console.log(`+ Added M5 ${boss.name}`);
       } else {
         await connection.query(
-          `UPDATE bosses SET attack_type=?, level=?, respawn_hours=?, location=? WHERE name=? AND server="M5"`,
+          `UPDATE bosses SET attack_type=?, level=?, respawn_hours=?, location=? WHERE name=? AND server='M5'`,
           [boss.attackType, boss.level, boss.respawnHours, boss.location, boss.name]
         );
       }
 
       // 2. Ensure M1 boss exists
       const [rowsM1] = await connection.query<any[]>(
-        'SELECT id FROM bosses WHERE name = ? AND server = "M1"', 
+        "SELECT id FROM bosses WHERE name = ? AND server = 'M1'", 
         [boss.name]
       );
       
       if (rowsM1.length === 0) {
         await connection.query(
           `INSERT INTO bosses (name, server, attack_type, level, respawn_hours, location, created_at) 
-           VALUES (?, "M1", ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+           VALUES (?, 'M1', ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
           [boss.name, boss.attackType, boss.level, boss.respawnHours, boss.location]
         );
         console.log(`+ Added M1 ${boss.name}`);
       } else {
         await connection.query(
-          `UPDATE bosses SET attack_type=?, level=?, respawn_hours=?, location=? WHERE name=? AND server="M1"`,
+          `UPDATE bosses SET attack_type=?, level=?, respawn_hours=?, location=? WHERE name=? AND server='M1'`,
           [boss.attackType, boss.level, boss.respawnHours, boss.location, boss.name]
         );
       }
