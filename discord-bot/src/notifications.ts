@@ -55,9 +55,11 @@ async function checkBosses(client: Client) {
     // Or just use pure seconds for safety across versions
     // 9m 30s = 570 seconds
     // 10m 30s = 630 seconds
+    // Filter by server = 'M5' (which corresponds to UI M1)
     const [bosses] = await pool.query<RowDataPacket[]>(`
       SELECT * FROM bosses 
-      WHERE next_spawn_at BETWEEN DATE_ADD(NOW(), INTERVAL 570 SECOND) 
+      WHERE server = 'M5' 
+      AND next_spawn_at BETWEEN DATE_ADD(NOW(), INTERVAL 570 SECOND) 
                               AND DATE_ADD(NOW(), INTERVAL 630 SECOND)
     `);
 

@@ -37,10 +37,10 @@ export async function handleKillCommand(message: Message, args: string[]) {
   }
 
   try {
-    // Find boss (case-insensitive partial match) - Targeting M1 only as requested
+    // Find boss (case-insensitive partial match) - Targeting M5 (Which is now labeled M1 in frontend)
     // Using LOWER() to ensure case-insensitivity regardless of DB collation
     const [bosses] = await pool.query<RowDataPacket[]>(
-      "SELECT * FROM bosses WHERE LOWER(name) LIKE LOWER(?) AND server = 'M1' LIMIT 1",
+      "SELECT * FROM bosses WHERE LOWER(name) LIKE LOWER(?) AND server = 'M5' LIMIT 1",
       [`%${bossNameSearch}%`]
     );
 
@@ -75,7 +75,7 @@ export async function handleKillCommand(message: Message, args: string[]) {
 export async function handleAllBossesCommand(message: Message) {
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      "SELECT name, respawn_hours, next_spawn_at, level FROM bosses WHERE server = 'M1' ORDER BY (next_spawn_at IS NULL), next_spawn_at ASC"
+      "SELECT name, respawn_hours, next_spawn_at, level FROM bosses WHERE server = 'M5' ORDER BY (next_spawn_at IS NULL), next_spawn_at ASC"
     );
 
     if (rows.length === 0) {
