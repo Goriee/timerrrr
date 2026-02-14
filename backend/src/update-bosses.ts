@@ -9,14 +9,16 @@ async function updateBosses() {
     console.log('Starting boss update...');
 
     // Remove duplicates keeping the lowest ID (safeguard)
+    // Only remove if name AND server are the same
     await connection.query(`
       DELETE t1 FROM bosses t1
       INNER JOIN bosses t2 
       WHERE 
           t1.id > t2.id AND 
-          t1.name = t2.name
+          t1.name = t2.name AND
+          t1.server = t2.server
     `);
-    console.log('✓ Removed duplicate bosses');
+    console.log('✓ Removed duplicate bosses within duplicate servers');
     
     // Clear existing bosses
     // await connection.query('DELETE FROM bosses');
@@ -59,29 +61,47 @@ async function updateBosses() {
     ];
 
     for (const boss of bosses) {
-      // Check if boss exists
-      const [rows] = await connection.query<any[]>(
-        'SELECT id FROM bosses WHERE name = ?', 
+      // 1. Ensure M5 boss exists
+      const [rowsM5] = await connection.query<any[]>(
+        'SELECT id FROM bosses WHERE name = ? AND server = "M5"', 
         [boss.name]
       );
       
-      if (rows.length === 0) {
+      if (rowsM5.length === 0) {
         await connection.query(
-          `INSERT INTO bosses (name, attack_type, level, respawn_hours, location, created_at) 
-           VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          `INSERT INTO bosses (name, server, attack_type, level, respawn_hours, location, created_at) 
+           VALUES (?, "M5", ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
           [boss.name, boss.attackType, boss.level, boss.respawnHours, boss.location]
         );
-        console.log(`+ Added ${boss.name}`);
+        console.log(`+ Added M5 ${boss.name}`);
       } else {
-        // Optional: Update static data if needed, but preserve kill times
         await connection.query(
-          `UPDATE bosses SET attack_type=?, level=?, respawn_hours=?, location=? WHERE name=?`,
+          `UPDATE bosses SET attack_type=?, level=?, respawn_hours=?, location=? WHERE name=? AND server="M5"`,
           [boss.attackType, boss.level, boss.respawnHours, boss.location, boss.name]
         );
-        console.log(`~ Updated ${boss.name}`);
+      }
+
+      // 2. Ensure M1 boss exists
+      const [rowsM1] = await connection.query<any[]>(
+        'SELECT id FROM bosses WHERE name = ? AND server = "M1"', 
+        [boss.name]
+      );
+      
+      if (rowsM1.length === 0) {
+        await connection.query(
+          `INSERT INTO bosses (name, server, attack_type, level, respawn_hours, location, created_at) 
+           VALUES (?, "M1", ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          [boss.name, boss.attackType, boss.level, boss.respawnHours, boss.location]
+        );
+        console.log(`+ Added M1 ${boss.name}`);
+      } else {
+        await connection.query(
+          `UPDATE bosses SET attack_type=?, level=?, respawn_hours=?, location=? WHERE name=? AND server="M1"`,
+          [boss.attackType, boss.level, boss.respawnHours, boss.location, boss.name]
+        );
       }
     }
-    console.log(`✓ Inserted ${bosses.length} bosses`);
+    console.log(`✓ Inserted/Updated bosses for M1 & M5`);
 
     // Remove any bosses from DB that are not in our list
     const bossNames = bosses.map(b => b.name);
