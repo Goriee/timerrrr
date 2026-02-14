@@ -63,7 +63,7 @@ export async function handleKillCommand(message: Message, args: string[]) {
       [now, nextSpawn, boss.id]
     );
 
-    message.reply(`✅ **${boss.name}** killed! Next spawn in ${boss.respawn_hours}h at <t:${unixTime}:f> (<t:${unixTime}:R>).`);
+    message.reply(`✅ **${boss.name}** (M1) killed! Next spawn in ${boss.respawn_hours}h at <t:${unixTime}:f> (<t:${unixTime}:R>).`);
   } catch (error) {
     console.error(error);
     message.reply('An error occurred while updating the boss timer.');
@@ -136,7 +136,7 @@ export async function handleAllBossesCommand(message: Message) {
 
     // 1. Send Main Boss List Embed
     const mainEmbed = new EmbedBuilder()
-        .setTitle('All Bosses')
+        .setTitle('All Bosses (M1 Server)')
         .setDescription(mainDescription)
         .setColor(0x2B2D31);
 
