@@ -26,16 +26,26 @@ const client = new Client({
   ],
 });
 
-client.once('ready', () => {
+// The 'ready' event was renamed to 'clientReady' in discord.js v15. Listen for
+// the new event and also keep listening to 'ready' for backwards compatibility.
+// Ensure the handler only runs once even if both events fire in some envs.
+let _readyHandled = false;
+function handleClientReady() {
+  if (_readyHandled) return;
+  _readyHandled = true;
+
   console.log(`Logged in as ${client.user?.tag}!`);
-  
+
   // Start the notification scanner
   startNotificationScanner(client);
-  
+
   // Generate an invite link for the bot
   const inviteLink = `https://discord.com/api/oauth2/authorize?client_id=${client.user?.id}&permissions=277025773568&scope=bot`;
   console.log(`Invite link: ${inviteLink}`);
-});
+}
+
+client.once('clientReady', handleClientReady);
+client.once('ready', handleClientReady);
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
