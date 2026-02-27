@@ -28,6 +28,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
+  rest: { timeout: 60000 } // Increase REST timeout for slow environments
 });
 
 // The 'ready' event was renamed to 'clientReady' in discord.js v15. Listen for
