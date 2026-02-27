@@ -49,6 +49,12 @@ function handleClientReady() {
 }
 
 client.once('ready', handleClientReady);
+client.once('clientReady', handleClientReady);
+
+// Add debug logging for connection state
+client.on('debug', console.log);
+client.on('error', console.error);
+client.on('warn', console.warn);
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
