@@ -48,7 +48,7 @@ function handleClientReady() {
   console.log(`Invite link: ${inviteLink}`);
 }
 
-client.once('clientReady', handleClientReady);
+client.once('ready', handleClientReady);
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
